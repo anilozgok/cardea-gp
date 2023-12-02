@@ -14,10 +14,6 @@ func NewAppServer() *AppServer {
 
 	//app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
 
-	/*if os.Getenv("AUTHORIZATION") == "cardea" {
-		app.Use(middlewares.AuthorizeUser())
-	}*/
-
 	//TODO::define liveness and readiness probes to this endpoint while deploying to k8s
 	app.Get("/health", healthCheck)
 
