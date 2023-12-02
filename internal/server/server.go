@@ -26,6 +26,7 @@ func NewAppServer(db *gorm.DB) *AppServer {
 	}
 }
 
+// TODO:: ask to gpt that what happens if an error occurs s.app.Listen
 func (s *AppServer) Start() {
 	go s.app.Listen(":8080")
 }

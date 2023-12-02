@@ -18,7 +18,7 @@ func New(config *config.Config) *DB {
 	}
 }
 
-func (d *DB) InitializeDB() (*gorm.DB, error) {
+func (d *DB) Initialize() (*gorm.DB, error) {
 	db, err := d.connect()
 	if err != nil {
 		return nil, err
