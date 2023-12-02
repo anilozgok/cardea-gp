@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"github.com/anilozgok/cardea-gp/internal/config"
+	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/internal/server"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"os"
 	"os/signal"
 	"syscall"
@@ -28,39 +27,22 @@ func init() {
 }
 
 func main() {
-	appServer := server.NewAppServer()
-	appServer.Start()
-
 	configs, err := config.Get()
 	if err != nil {
 		zap.L().Fatal("failed to read configs", zap.Error(err))
 	}
 
-	db := connectDB(configs, err)
+	db := database.New(configs)
+
+	database, err := db.InitializeDB()
+	if err != nil {
+		zap.L().Fatal("failed to initialize database", zap.Error(err))
+	}
+
+	appServer := server.NewAppServer(database)
+	appServer.Start()
 
 	gracefulShutdown(appServer)
-}
-
-func connectDB(config *config.Config, err error) *gorm.DB {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d",
-		config.CardeaDB.Host,
-		config.Secrets.CardeaDBCredentials.Username,
-		config.Secrets.CardeaDBCredentials.Password,
-		config.CardeaDB.Database,
-		config.CardeaDB.Port,
-	)
-
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		zap.L().Fatal("failed to connect to cardea db", zap.Error(err))
-	}
-
-	err = db.AutoMigrate()
-	if err != nil {
-		zap.L().Fatal("failed to migrate to cardea db", zap.Error(err))
-	}
-
-	return db
 }
 
 func gracefulShutdown(appServer *server.AppServer) {

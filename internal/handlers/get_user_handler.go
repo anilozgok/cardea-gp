@@ -1,8 +1,11 @@
 package handlers
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
+)
 
-func NewGetUsersHandler() func(c *fiber.Ctx) error {
+func NewGetUsersHandler(db *gorm.DB) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		//TODO:: GetUsers logic
 		list := []string{"user1", "user2", "user3"}
