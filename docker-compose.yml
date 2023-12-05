@@ -1,0 +1,36 @@
+version: '3.8'
+services:
+  cardea:
+    container_name: cardea-gp
+    build: ./
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgresql
+    #    depends_on:
+    #      postgresql:
+    #        condition: service_healthy
+    networks:
+      - cardea-network
+
+  postgresql:
+    image: postgres:15
+    container_name: cardea_db
+    restart: always
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=cardea
+    ports:
+      - "5432:5432"
+    networks:
+      - cardea-network
+#    healthcheck:
+#      test: ["CMD", "pg_isready"]
+#      interval: 5s
+#      timeout: 10s
+#      retries: 3
+
+networks:
+  cardea-network:
+    driver: bridge

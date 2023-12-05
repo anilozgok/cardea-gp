@@ -3,9 +3,11 @@ package database
 import (
 	"fmt"
 	"github.com/anilozgok/cardea-gp/internal/config"
+	"github.com/anilozgok/cardea-gp/internal/entities"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"time"
 )
 
 type DB struct {
@@ -18,13 +20,19 @@ func New(config *config.Config) *DB {
 	}
 }
 
-func (d *DB) Initialize() (*gorm.DB, error) {
+func (d *DB) Initialize() *gorm.DB {
+	time.Sleep(5 * time.Second) // wait for db to be ready
 	db, err := d.connect()
 	if err != nil {
-		return nil, err
+		zap.L().Fatal("failed to connect to cardea db", zap.Error(err))
 	}
 
-	return db, migrate(db)
+	err = migrate(db)
+	if err != nil {
+		zap.L().Fatal("failed to migrate to cardea db", zap.Error(err))
+	}
+
+	return db
 }
 
 func (d *DB) connect() (*gorm.DB, error) {
@@ -45,5 +53,7 @@ func (d *DB) connect() (*gorm.DB, error) {
 }
 
 func migrate(db *gorm.DB) error {
-	return db.AutoMigrate()
+	return db.AutoMigrate(
+		&entities.User{},
+	)
 }

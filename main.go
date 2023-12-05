@@ -32,12 +32,9 @@ func main() {
 		zap.L().Fatal("failed to read configs", zap.Error(err))
 	}
 
-	cDB := database.New(configs)
-
-	db, err := cDB.Initialize()
-	if err != nil {
-		zap.L().Fatal("failed to initialize database", zap.Error(err))
-	}
+	db := database.
+		New(configs).
+		Initialize()
 
 	appServer := server.NewAppServer(db)
 	appServer.Start()

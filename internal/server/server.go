@@ -19,14 +19,16 @@ func NewAppServer(db *gorm.DB) *AppServer {
 	app.Get("/health", healthCheck)
 
 	r := app.Group("/api/v1")
-	r.Get("/users", handlers.NewGetUsersHandler(db))
+
+	//USER ENDPOINTS
+	userGroup := r.Group("/users")
+	userGroup.Post("/", handlers.CreateNewUserHandler(db))
 
 	return &AppServer{
 		app: app,
 	}
 }
 
-// TODO:: ask to gpt that what happens if an error occurs s.app.Listen
 func (s *AppServer) Start() {
 	go s.app.Listen(":8080")
 }

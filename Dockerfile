@@ -1,4 +1,4 @@
-FROM golang:1.20 AS builder
+FROM golang:1.21 AS builder
 
 WORKDIR /app
 COPY . .
@@ -9,9 +9,9 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o cardea /app/main.go
 FROM alpine
 
 WORKDIR /app
-COPY --from=builder /app/wincoi /app/wincoi
+COPY --from=builder /app/cardea /app/cardea
 COPY --from=builder /app/configs /app/configs
 
 EXPOSE 8080
 
-CMD ["/app/wincoi"]
+CMD ["/app/cardea"]

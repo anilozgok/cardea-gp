@@ -29,9 +29,8 @@ func Get() (*Config, error) {
 }
 
 func watchFile[T any](bindTo *T, file string, watcher *viper.Viper) error {
-	watcher.AddConfigPath("./configs")             // local folder
-	watcher.AddConfigPath("/home/nonroot/configs") // required for container
-	//watcher.AddConfigPath("/app/configs") TODO:: check containerized app's configs path
+	watcher.AddConfigPath("./configs")    // local folder
+	watcher.AddConfigPath("/app/configs") // required for container
 	watcher.SetConfigName(file)
 	watcher.SetConfigType("json")
 	watcher.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))

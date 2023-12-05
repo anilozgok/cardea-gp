@@ -1,6 +1,6 @@
 {
   "cardeaDB": {
-    "host": "localhost",
+    "host": "postgresql",
     "port": 5432,
     "database": "cardea"
   }
