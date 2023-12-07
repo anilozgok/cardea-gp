@@ -25,17 +25,21 @@ func LoginHandler(db *gorm.DB) func(c *fiber.Ctx) error {
 		if result := db.Where("email = ?", req.Email).First(&user); result.Error != nil {
 			return result.Error
 		}
+
 		if result := db.Where(&user).First(&user); result.Error != nil {
 			return result.Error
 		}
+
 		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 			return errors.New("invalid credentials")
 		}
+
 		tokenString, err := auth.CreateToken(req.Email)
 		if err != nil {
 			return err
 		}
 
+		//TODO:: set expire time. we can discuss ttl
 		c.Cookie(&fiber.Cookie{
 			Name:  "jwt",
 			Value: tokenString,

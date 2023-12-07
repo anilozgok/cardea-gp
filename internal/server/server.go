@@ -24,6 +24,8 @@ func NewAppServer(db *gorm.DB) *AppServer {
 	userGroup := r.Group("/users")
 	userGroup.Post("/", handlers.CreateNewUserHandler(db))
 
+	//TODO:: add login logout endpoints under auth group
+
 	return &AppServer{
 		app: app,
 	}

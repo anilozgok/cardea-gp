@@ -10,6 +10,7 @@ import (
 
 // Compare this snippet from internal/handlers/create_new_user_handler_test.go:
 
+//TODO:: all the tests should be under a parent test as a subtests. e.g. create_user_handler_test
 func TestCreateToken(t *testing.T) {
 	email := "email"
 	token, err := CreateToken(email)

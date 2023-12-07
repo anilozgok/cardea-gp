@@ -8,10 +8,10 @@ import (
 	"time"
 )
 
+//TODO:: generate a proper secret key and store in the secrets.json and read from there
 const secretKey = "my_super_secure_secret_key_123!@#"
 
-// It's best to store this in an environment variable
-
+//TODO:: add role to the claims
 // Claims represents the claims that can be encoded in a JWT
 type Claims struct {
 	Email string `json:"email"`
@@ -36,6 +36,7 @@ func CreateToken(email string) (string, error) {
 	return tokenString, nil
 }
 
+//TODO:: if you are using middleware in this package which is not recommended, you should make this function private
 // VerifyToken verifies the JWT token and returns the claims
 func VerifyToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -49,6 +50,8 @@ func VerifyToken(tokenString string) (*jwt.Token, error) {
 	}
 	return token, nil
 }
+
+//TODO:: middlewares should be in another package called middlewares
 func JWTMiddleware() func(*fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
 		tokenString := c.Get("Authorization")
