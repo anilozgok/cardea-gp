@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"github.com/anilozgok/cardea-gp/internal/auth"
 	"github.com/anilozgok/cardea-gp/internal/entities"
 	"github.com/anilozgok/cardea-gp/internal/model/request"
 	"github.com/anilozgok/cardea-gp/internal/validators"
@@ -40,6 +41,10 @@ func CreateNewUserHandler(db *gorm.DB) func(c *fiber.Ctx) error {
 		}
 
 		//TODO:: return jwt
-		return c.JSON("Ok")
+		tokenString, err := auth.CreateToken(req.Email)
+		if err != nil {
+			return err
+		}
+		return c.JSON(map[string]string{"token": tokenString})
 	}
 }
