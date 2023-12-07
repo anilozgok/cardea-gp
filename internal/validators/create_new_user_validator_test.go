@@ -24,7 +24,6 @@ func TestValidateCreateNewUserRequest(t *testing.T) {
 		errorContains(t, err, "email cannot be empty")
 	})
 
-	//TODO:: complete missing test cases
 	t.Run("empty password should return error", func(t *testing.T) {
 		err := ValidateCreateNewUserRequest(&request.CreateNewUserRequest{
 			Email:     "email",

@@ -34,6 +34,7 @@ func ValidateCreateNewUserRequest(req *request.CreateNewUserRequest) error {
 	if req.Role == "" {
 		err = errors.Join(err, errors.New("role cannot be empty"))
 	}
+
 	if req.Role != "admin" && req.Role != "user" {
 		err = errors.Join(err, errors.New("role can be either admin or user"))
 	}

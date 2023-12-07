@@ -35,6 +35,12 @@ func LoginHandler(db *gorm.DB) func(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
+
+		c.Cookie(&fiber.Cookie{
+			Name:  "jwt",
+			Value: tokenString,
+		})
+
 		return c.JSON(map[string]string{"token": tokenString})
 	}
 
