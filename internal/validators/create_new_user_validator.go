@@ -9,7 +9,7 @@ var (
 	ErrRequestBodyCannotBeEmpty = errors.New("request body cannot be empty")
 )
 
-func ValidateCreateNewUserRequest(req *request.CreateNewUserRequest) error {
+func ValidateCreateNewUserRequest(req *request.NewUserRequest) error {
 	if req == nil {
 		return ErrRequestBodyCannotBeEmpty
 	}

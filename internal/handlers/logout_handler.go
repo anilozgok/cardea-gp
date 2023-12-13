@@ -1,14 +1,28 @@
 package handlers
 
 import (
+	"github.com/anilozgok/cardea-gp/internal/repository"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
+	"time"
 )
 
-//TODO:: should we clear the cookie when we logout or we just set cookie value to the empty string and expire date to current time? lets discuss
-func LogoutHandler(db *gorm.DB) func(c *fiber.Ctx) error {
+type LogoutHandler struct {
+	repo repository.Repository
+}
+
+func NewLogoutHandler(repo repository.Repository) *LogoutHandler {
+	return &LogoutHandler{
+		repo: repo,
+	}
+}
+
+func (h *LogoutHandler) Handle() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		c.ClearCookie("jwt")
-		return c.SendString("Logged out successfully!")
+		c.Cookie(&fiber.Cookie{
+			Name:    "authSession",
+			Value:   "",
+			Expires: time.Now().Add(-time.Hour * 24),
+		})
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success"})
 	}
 }
