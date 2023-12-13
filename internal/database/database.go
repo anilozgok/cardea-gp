@@ -7,7 +7,6 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"time"
 )
 
 type DB struct {
@@ -21,7 +20,6 @@ func New(config *config.Config) *DB {
 }
 
 func (d *DB) Initialize() *gorm.DB {
-	time.Sleep(5 * time.Second) // wait for db to be ready
 	db, err := d.connect()
 	if err != nil {
 		zap.L().Fatal("failed to connect to cardea db", zap.Error(err))
