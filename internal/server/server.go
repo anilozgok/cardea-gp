@@ -1,28 +1,37 @@
 package server
 
 import (
+	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/handlers"
+	"github.com/anilozgok/cardea-gp/internal/middlewares"
+	"github.com/anilozgok/cardea-gp/internal/repository"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 type AppServer struct {
-	app *fiber.App
+	app    *fiber.App
+	config *config.Config
 }
 
-func NewAppServer(db *gorm.DB) *AppServer {
+func NewAppServer(db *gorm.DB, config *config.Config) *AppServer {
 	app := fiber.New()
-
-	//app.Get("/metrics", adaptor.HTTPHandler(promhttp.Handler()))
-
-	//TODO::define liveness and readiness probes to this endpoint while deploying to k8s
 	app.Get("/health", healthCheck)
-
 	r := app.Group("/api/v1")
 
-	//USER ENDPOINTS
+	repo := repository.NewRepository(db)
+
+	register := handlers.NewRegisterHandler(repo)
+	r.Post("/register", register.Handle())
+
+	login := handlers.NewLoginHandler(repo)
+	r.Post("/login", login.Handle())
+
+	logout := handlers.NewLogoutHandler(repo)
+	r.Post("/logout", middlewares.AuthMiddleware, logout.Handle())
+
 	userGroup := r.Group("/users")
-	userGroup.Post("/", handlers.CreateNewUserHandler(db))
+	userGroup.Use(middlewares.AuthMiddleware)
 
 	return &AppServer{
 		app: app,

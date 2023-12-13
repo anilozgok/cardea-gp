@@ -14,8 +14,18 @@ var (
 )
 
 func Get() (*Config, error) {
+	viper.SetConfigName("jwt")
+	viper.SetConfigType("json")
+	viper.AddConfigPath("./configs")
+	viper.AutomaticEnv()
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		return nil, err
+	}
+
 	config := Default()
-	err := watchFile[Config](config, "configs", configWatcher)
+	err = watchFile[Config](config, "configs", configWatcher)
 	if err != nil {
 		return nil, err
 	}

@@ -14,7 +14,7 @@ func TestValidateCreateNewUserRequest(t *testing.T) {
 	})
 
 	t.Run("empty email should return error", func(t *testing.T) {
-		err := ValidateCreateNewUserRequest(&request.CreateNewUserRequest{
+		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
 			Email:     "",
 			Password:  "password",
 			Firstname: "firstname",
@@ -24,7 +24,59 @@ func TestValidateCreateNewUserRequest(t *testing.T) {
 		errorContains(t, err, "email cannot be empty")
 	})
 
-	//TODO:: complete missing test cases
+	t.Run("empty password should return error", func(t *testing.T) {
+		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+			Email:     "email",
+			Password:  "",
+			Firstname: "firstname",
+			LastName:  "lastname",
+		})
+
+		errorContains(t, err, "password cannot be empty")
+	})
+
+	t.Run("empty firstname should return error", func(t *testing.T) {
+		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+			Email:     "email",
+			Password:  "password",
+			Firstname: "",
+			LastName:  "lastname",
+		})
+
+		errorContains(t, err, "first name cannot be empty")
+	})
+
+	t.Run("empty lastname should return error", func(t *testing.T) {
+		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+			Email:     "email",
+			Password:  "password",
+			Firstname: "firstname",
+			LastName:  "",
+		})
+		errorContains(t, err, "last name cannot be empty")
+	})
+
+	t.Run("empty role should return error", func(t *testing.T) {
+		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+			Email:     "email",
+			Password:  "password",
+			Firstname: "firstname",
+			LastName:  "lastname",
+			Role:      "",
+		})
+		errorContains(t, err, "role cannot be empty")
+	})
+
+	t.Run("invalid role should return error", func(t *testing.T) {
+		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+			Email:     "email",
+			Password:  "password",
+			Firstname: "firstname",
+			LastName:  "lastname",
+			Role:      "invalid_role",
+		})
+		errorContains(t, err, "role can be either admin or user")
+	})
 
 }
 

@@ -4,16 +4,26 @@ import (
 	"errors"
 	"github.com/anilozgok/cardea-gp/internal/entities"
 	"github.com/anilozgok/cardea-gp/internal/model/request"
+	"github.com/anilozgok/cardea-gp/internal/repository"
 	"github.com/anilozgok/cardea-gp/internal/validators"
 	"github.com/gofiber/fiber/v2"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 	"strings"
 )
 
-func CreateNewUserHandler(db *gorm.DB) func(c *fiber.Ctx) error {
+type RegisterHandler struct {
+	repo repository.Repository
+}
+
+func NewRegisterHandler(repo repository.Repository) *RegisterHandler {
+	return &RegisterHandler{
+		repo: repo,
+	}
+}
+
+func (h *RegisterHandler) Handle() func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
-		req := new(request.CreateNewUserRequest)
+		req := new(request.NewUserRequest)
 		if err := c.BodyParser(req); err != nil {
 			return err
 		}
@@ -35,11 +45,10 @@ func CreateNewUserHandler(db *gorm.DB) func(c *fiber.Ctx) error {
 			Role:      strings.ToLower(req.Role),
 		}
 
-		if result := db.Save(&user); result.Error != nil {
-			return result.Error
+		if err = h.repo.CreateNewUser(c.Context(), &user); err != nil {
+			return err
 		}
 
-		//TODO:: return jwt
-		return c.JSON("Ok")
+		return c.SendStatus(fiber.StatusOK)
 	}
 }
