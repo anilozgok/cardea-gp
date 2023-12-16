@@ -8,13 +8,13 @@ import (
 
 func TestValidateCreateNewUserRequest(t *testing.T) {
 	t.Run("nil req should return error", func(t *testing.T) {
-		err := ValidateCreateNewUserRequest(nil)
+		err := ValidateNewUserRequest(nil)
 
 		assert.EqualError(t, err, ErrRequestBodyCannotBeEmpty.Error())
 	})
 
 	t.Run("empty email should return error", func(t *testing.T) {
-		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+		err := ValidateNewUserRequest(&request.NewUserRequest{
 			Email:     "",
 			Password:  "password",
 			Firstname: "firstname",
@@ -25,7 +25,7 @@ func TestValidateCreateNewUserRequest(t *testing.T) {
 	})
 
 	t.Run("empty password should return error", func(t *testing.T) {
-		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+		err := ValidateNewUserRequest(&request.NewUserRequest{
 			Email:     "email",
 			Password:  "",
 			Firstname: "firstname",
@@ -36,7 +36,7 @@ func TestValidateCreateNewUserRequest(t *testing.T) {
 	})
 
 	t.Run("empty firstname should return error", func(t *testing.T) {
-		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+		err := ValidateNewUserRequest(&request.NewUserRequest{
 			Email:     "email",
 			Password:  "password",
 			Firstname: "",
@@ -47,7 +47,7 @@ func TestValidateCreateNewUserRequest(t *testing.T) {
 	})
 
 	t.Run("empty lastname should return error", func(t *testing.T) {
-		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+		err := ValidateNewUserRequest(&request.NewUserRequest{
 			Email:     "email",
 			Password:  "password",
 			Firstname: "firstname",
@@ -57,7 +57,7 @@ func TestValidateCreateNewUserRequest(t *testing.T) {
 	})
 
 	t.Run("empty role should return error", func(t *testing.T) {
-		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+		err := ValidateNewUserRequest(&request.NewUserRequest{
 			Email:     "email",
 			Password:  "password",
 			Firstname: "firstname",
@@ -68,7 +68,7 @@ func TestValidateCreateNewUserRequest(t *testing.T) {
 	})
 
 	t.Run("invalid role should return error", func(t *testing.T) {
-		err := ValidateCreateNewUserRequest(&request.NewUserRequest{
+		err := ValidateNewUserRequest(&request.NewUserRequest{
 			Email:     "email",
 			Password:  "password",
 			Firstname: "firstname",

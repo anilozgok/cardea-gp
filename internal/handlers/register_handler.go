@@ -2,53 +2,64 @@ package handlers
 
 import (
 	"errors"
-	"github.com/anilozgok/cardea-gp/internal/entities"
+	"github.com/anilozgok/cardea-gp/internal/database"
+	"github.com/anilozgok/cardea-gp/internal/model/entities"
 	"github.com/anilozgok/cardea-gp/internal/model/request"
-	"github.com/anilozgok/cardea-gp/internal/repository"
 	"github.com/anilozgok/cardea-gp/internal/validators"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
 )
 
 type RegisterHandler struct {
-	repo repository.Repository
+	repo database.Repository
 }
 
-func NewRegisterHandler(repo repository.Repository) *RegisterHandler {
+func NewRegisterHandler(repo database.Repository) *RegisterHandler {
 	return &RegisterHandler{
 		repo: repo,
 	}
 }
 
-func (h *RegisterHandler) Handle() func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		req := new(request.NewUserRequest)
-		if err := c.BodyParser(req); err != nil {
-			return err
-		}
-
-		if err := validators.ValidateCreateNewUserRequest(req); err != nil {
-			return err
-		}
-
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
-		if err != nil {
-			return errors.New("error while encrypting the password")
-		}
-
-		user := entities.User{
-			Email:     req.Email,
-			Password:  string(hashedPassword),
-			Firstname: req.Firstname,
-			LastName:  req.LastName,
-			Role:      strings.ToLower(req.Role),
-		}
-
-		if err = h.repo.CreateNewUser(c.Context(), &user); err != nil {
-			return err
-		}
-
-		return c.SendStatus(fiber.StatusOK)
+func (h *RegisterHandler) Handle(c *fiber.Ctx) error {
+	req := new(request.NewUserRequest)
+	if err := c.BodyParser(req); err != nil {
+		zap.L().Error("error while parsing request body", zap.Error(err))
+		c.Status(fiber.StatusBadRequest)
+		return err
 	}
+
+	if err := validators.ValidateNewUserRequest(req); err != nil {
+		zap.L().Error("error while validating request body", zap.Error(err))
+		c.Status(fiber.StatusBadRequest)
+		return err
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
+	if err != nil {
+		zap.L().Error("error while encrypting the password", zap.Error(err))
+		c.Status(fiber.StatusInternalServerError)
+		return errors.New("error while encrypting the password")
+	}
+
+	user := entities.User{
+		FirstName:   req.Firstname,
+		LastName:    req.LastName,
+		Email:       req.Email,
+		Password:    string(hashedPassword),
+		Height:      req.Height,
+		Weight:      req.Weight,
+		Gender:      req.Gender,
+		DateOfBirth: req.DateOfBirth,
+		Role:        strings.ToLower(req.Role),
+	}
+
+	if err = h.repo.CreateNewUser(c.Context(), &user); err != nil {
+		zap.L().Error("error while creating new user", zap.Error(err))
+		c.Status(fiber.StatusInternalServerError)
+		return err
+	}
+
+	return c.SendStatus(fiber.StatusOK)
 }

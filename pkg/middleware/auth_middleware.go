@@ -1,8 +1,8 @@
-package middlewares
+package middleware
 
 import (
 	"errors"
-	"github.com/anilozgok/cardea-gp/internal/jwt"
+	"github.com/anilozgok/cardea-gp/pkg/jwt"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 	"strings"
@@ -28,7 +28,7 @@ func AuthMiddleware(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	if claims.Email == "" || claims.UserId == 0 {
+	if claims == nil || claims.Email == "" || claims.UserId == 0 {
 		zap.L().Error("no claim found", zap.String("token", auth))
 		return errors.New("no claim found")
 	}
