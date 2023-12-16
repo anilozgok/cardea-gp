@@ -3,7 +3,7 @@ package server
 import (
 	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/handlers"
-	"github.com/anilozgok/cardea-gp/internal/middlewares"
+	"github.com/anilozgok/cardea-gp/internal/middleware"
 	"github.com/anilozgok/cardea-gp/internal/repository"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -22,16 +22,16 @@ func NewAppServer(db *gorm.DB, config *config.Config) *AppServer {
 	repo := repository.NewRepository(db)
 
 	register := handlers.NewRegisterHandler(repo)
-	r.Post("/register", register.Handle())
+	r.Post("/register", register.Handle)
 
 	login := handlers.NewLoginHandler(repo)
-	r.Post("/login", login.Handle())
+	r.Post("/login", login.Handle)
 
 	logout := handlers.NewLogoutHandler(repo)
-	r.Post("/logout", middlewares.AuthMiddleware, logout.Handle())
+	r.Post("/logout", middleware.AuthMiddleware, logout.Handle)
 
 	userGroup := r.Group("/users")
-	userGroup.Use(middlewares.AuthMiddleware)
+	userGroup.Use(middleware.AuthMiddleware)
 
 	return &AppServer{
 		app: app,
