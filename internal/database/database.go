@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"github.com/anilozgok/cardea-gp/internal/config"
-	"github.com/anilozgok/cardea-gp/internal/entities"
+	"github.com/anilozgok/cardea-gp/internal/model/entities"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -1,14 +1,15 @@
-package repository
+package database
 
 import (
 	"context"
-	"github.com/anilozgok/cardea-gp/internal/entities"
+	"github.com/anilozgok/cardea-gp/internal/model/entities"
 	"gorm.io/gorm"
 )
 
 type Repository interface {
 	CreateNewUser(ctx context.Context, user *entities.User) error
 	GetUserByEmail(ctx context.Context, email string) (*entities.User, error)
+	GetUsers(ctx context.Context) ([]entities.User, error)
 }
 
 type repository struct {
@@ -28,4 +29,13 @@ func (r *repository) GetUserByEmail(ctx context.Context, email string) (*entitie
 	user := new(entities.User)
 	tx := r.db.WithContext(ctx).Where("email = ?", email).First(user)
 	return user, tx.Error
+}
+
+func (r *repository) GetUsers(ctx context.Context) ([]entities.User, error) {
+	var users []entities.User
+	tx := r.db.WithContext(ctx).Find(&users)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return users, nil
 }

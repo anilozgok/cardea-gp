@@ -1,16 +1,16 @@
 package handlers
 
 import (
-	"github.com/anilozgok/cardea-gp/internal/repository"
+	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/gofiber/fiber/v2"
 	"time"
 )
 
 type LogoutHandler struct {
-	repo repository.Repository
+	repo database.Repository
 }
 
-func NewLogoutHandler(repo repository.Repository) *LogoutHandler {
+func NewLogoutHandler(repo database.Repository) *LogoutHandler {
 	return &LogoutHandler{
 		repo: repo,
 	}
