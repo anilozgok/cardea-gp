@@ -4,7 +4,6 @@ import (
 	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/internal/handlers"
-	"github.com/anilozgok/cardea-gp/pkg/middleware"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -14,27 +13,29 @@ type AppServer struct {
 	config *config.Config
 }
 
+type CardeaApp struct {
+	register *handlers.RegisterHandler
+	login    *handlers.LoginHandler
+	logout   *handlers.LogoutHandler
+	getUsers *handlers.GetUsersHandler
+}
+
 func NewAppServer(db *gorm.DB) *AppServer {
 	app := fiber.New()
 	app.Get("/health", healthCheck)
 
 	r := app.Group("/api/v1")
-
 	repo := database.NewRepository(db)
 
-	register := handlers.NewRegisterHandler(repo)
-	r.Post("/register", register.Handle)
+	cardeaApp := &CardeaApp{
+		register: handlers.NewRegisterHandler(repo),
+		login:    handlers.NewLoginHandler(repo),
+		logout:   handlers.NewLogoutHandler(repo),
+		getUsers: handlers.NewGetUsersHandler(repo),
+	}
 
-	login := handlers.NewLoginHandler(repo)
-	r.Post("/login", login.Handle)
-
-	logout := handlers.NewLogoutHandler(repo)
-	r.Post("/logout", middleware.AuthMiddleware, logout.Handle)
-
-	userGroup := r.Group("/users")
-	userGroup.Use(middleware.AuthMiddleware)
-	getUsers := handlers.NewGetUsersHandler(repo)
-	userGroup.Get("/get-all", middleware.RoleAdmin, getUsers.Handle)
+	router := NewRouter(cardeaApp, r)
+	router.InitializeRoute()
 
 	return &AppServer{
 		app: app,

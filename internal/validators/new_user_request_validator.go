@@ -52,7 +52,7 @@ func ValidateNewUserRequest(req *request.NewUserRequest) error {
 		err = errors.Join(err, errors.New("role cannot be empty"))
 	}
 
-	if req.Role != utils.ROLE_ADMIN && req.Role != utils.ROLE_USER || req.Role != utils.ROLE_COACH {
+	if req.Role != utils.ROLE_ADMIN && req.Role != utils.ROLE_USER && req.Role != utils.ROLE_COACH {
 		err = errors.Join(err, errors.New("invalid role"))
 	}
 
