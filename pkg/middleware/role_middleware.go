@@ -5,32 +5,32 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func RoleUser(ctx *fiber.Ctx) error {
-	role := ctx.Locals("role").(string)
+func RoleUser(c *fiber.Ctx) error {
+	role := c.Locals("role").(string)
 
 	if role != utils.ROLE_USER {
-		return ctx.SendStatus(fiber.StatusUnauthorized)
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	return ctx.Next()
+	return c.Next()
 }
 
-func RoleAdmin(ctx *fiber.Ctx) error {
-	role := ctx.Locals("role").(string)
+func RoleAdmin(c *fiber.Ctx) error {
+	role := c.Locals("role").(string)
 
 	if role != utils.ROLE_ADMIN {
-		return ctx.SendStatus(fiber.StatusUnauthorized)
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	return ctx.Next()
+	return c.Next()
 }
 
-func RoleCoach(ctx *fiber.Ctx) error {
-	role := ctx.Locals("role").(string)
+func RoleCoach(c *fiber.Ctx) error {
+	role := c.Locals("role").(string)
 
 	if role != utils.ROLE_COACH {
-		return ctx.SendStatus(fiber.StatusUnauthorized)
+		return c.SendStatus(fiber.StatusUnauthorized)
 	}
 
-	return ctx.Next()
+	return c.Next()
 }

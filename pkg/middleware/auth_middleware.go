@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-func AuthMiddleware(ctx *fiber.Ctx) error {
-	auth := ctx.Get("Authorization", "")
+func AuthMiddleware(c *fiber.Ctx) error {
+	auth := c.Get("Authorization")
 
 	if auth == "" {
 		zap.L().Error("no authorization token found")
@@ -33,10 +33,10 @@ func AuthMiddleware(ctx *fiber.Ctx) error {
 		return errors.New("no claim found")
 	}
 
-	ctx.Locals("user", claims)
-	ctx.Locals("role", claims.Role)
-	ctx.Locals("email", claims.Email)
-	ctx.Locals("userId", claims.UserId)
+	c.Locals("user", claims)
+	c.Locals("role", claims.Role)
+	c.Locals("email", claims.Email)
+	c.Locals("userId", claims.UserId)
 
-	return ctx.Next()
+	return c.Next()
 }
