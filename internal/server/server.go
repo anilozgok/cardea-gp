@@ -3,7 +3,6 @@ package server
 import (
 	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/database"
-	"github.com/anilozgok/cardea-gp/internal/handlers"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -13,13 +12,6 @@ type AppServer struct {
 	config *config.Config
 }
 
-type CardeaApp struct {
-	register *handlers.RegisterHandler
-	login    *handlers.LoginHandler
-	logout   *handlers.LogoutHandler
-	getUsers *handlers.GetUsersHandler
-}
-
 func NewAppServer(db *gorm.DB) *AppServer {
 	app := fiber.New()
 	app.Get("/health", healthCheck)
@@ -27,12 +19,7 @@ func NewAppServer(db *gorm.DB) *AppServer {
 	r := app.Group("/api/v1")
 	repo := database.NewRepository(db)
 
-	cardeaApp := &CardeaApp{
-		register: handlers.NewRegisterHandler(repo),
-		login:    handlers.NewLoginHandler(repo),
-		logout:   handlers.NewLogoutHandler(repo),
-		getUsers: handlers.NewGetUsersHandler(repo),
-	}
+	cardeaApp := NewCardeaApp(repo)
 
 	router := NewRouter(cardeaApp, r)
 	router.InitializeRoute()

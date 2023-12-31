@@ -21,7 +21,6 @@ func (r *Router) InitializeRoute() {
 	auth := r.router.Group("/auth")
 	auth.Post("/register", r.cardeaApp.register.Handle)
 	auth.Post("/login", r.cardeaApp.login.Handle)
-	auth.Post("/logout", middleware.AuthMiddleware, r.cardeaApp.logout.Handle)
 
 	user := r.router.Group("/user")
 	user.Get("/", middleware.AuthMiddleware, middleware.RoleAdmin, r.cardeaApp.getUsers.Handle)

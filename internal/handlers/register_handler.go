@@ -36,6 +36,19 @@ func (h *RegisterHandler) Handle(c *fiber.Ctx) error {
 		return err
 	}
 
+	maybeUser, err := h.repo.GetUserByEmail(c.Context(), req.Email)
+	if err != nil {
+		zap.L().Error("error while checking user existence", zap.Error(err))
+		c.Status(fiber.StatusInternalServerError)
+		return err
+	}
+
+	if maybeUser != nil {
+		zap.L().Error("user already exists", zap.Error(err))
+		c.Status(fiber.StatusBadRequest)
+		return errors.New("user already exists")
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
 	if err != nil {
 		zap.L().Error("error while encrypting the password", zap.Error(err))
