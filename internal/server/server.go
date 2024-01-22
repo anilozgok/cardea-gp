@@ -4,6 +4,7 @@ import (
 	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/gofiber/fiber/v2"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -13,7 +14,9 @@ type AppServer struct {
 }
 
 func NewAppServer(db *gorm.DB) *AppServer {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		DisableStartupMessage: true,
+	})
 	app.Get("/health", healthCheck)
 
 	r := app.Group("/api/v1")
@@ -30,7 +33,12 @@ func NewAppServer(db *gorm.DB) *AppServer {
 }
 
 func (s *AppServer) Start() {
-	go s.app.Listen(":8080")
+	go func() {
+		err := s.app.Listen(":8080")
+		if err != nil {
+			zap.L().Fatal("error while starting server", zap.Error(err))
+		}
+	}()
 }
 
 func (s *AppServer) Shutdown() error {

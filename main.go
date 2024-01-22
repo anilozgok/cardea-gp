@@ -38,6 +38,7 @@ func main() {
 
 	appServer := server.NewAppServer(db)
 	appServer.Start()
+	zap.L().Info("server started successfully on port :8080")
 
 	gracefulShutdown(appServer)
 }

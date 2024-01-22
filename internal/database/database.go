@@ -30,6 +30,8 @@ func (d *DB) Initialize() *gorm.DB {
 		zap.L().Fatal("failed to migrate to cardea db", zap.Error(err))
 	}
 
+	zap.L().Info("database initialized successfully")
+
 	return db
 }
 
@@ -42,12 +44,7 @@ func (d *DB) connect() (*gorm.DB, error) {
 		d.config.CardeaDB.Port,
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		zap.L().Error("failed to connect to cardea db", zap.Error(err))
-	}
-
-	return db, err
+	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
 }
 
 func migrate(db *gorm.DB) error {
