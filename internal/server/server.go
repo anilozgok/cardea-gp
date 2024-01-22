@@ -4,6 +4,7 @@ import (
 	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -13,10 +14,15 @@ type AppServer struct {
 	config *config.Config
 }
 
-func NewAppServer(db *gorm.DB) *AppServer {
+func NewAppServer(db *gorm.DB, isLocalMode bool) *AppServer {
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 	})
+
+	if isLocalMode {
+		app.Use(logger.New())
+	}
+
 	app.Get("/health", healthCheck)
 
 	r := app.Group("/api/v1")

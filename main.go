@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+var isLocalMode = os.Getenv("CARDEA_GP_LOCAL_MODE") == "true"
+
 func init() {
 	cfg := zap.NewProductionConfig()
 	cfg.EncoderConfig.TimeKey = "timestamp"
@@ -36,8 +38,9 @@ func main() {
 		New(configs).
 		Initialize()
 
-	appServer := server.NewAppServer(db)
+	appServer := server.NewAppServer(db, isLocalMode)
 	appServer.Start()
+
 	zap.L().Info("server started successfully on port :8080")
 
 	gracefulShutdown(appServer)
