@@ -2,6 +2,7 @@ package request
 
 import "time"
 
+// TODO:: add validation for the request using validator
 type NewUserRequest struct {
 	Firstname   string    `json:"firstName"`
 	LastName    string    `json:"lastName"`

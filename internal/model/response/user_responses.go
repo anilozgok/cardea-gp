@@ -17,3 +17,9 @@ type UserResponse struct {
 type UserListResponse struct {
 	Users []UserResponse `json:"users"`
 }
+
+type MeResponse struct {
+	UserId uint32 `json:"userId"`
+	Email  string `json:"email"`
+	Role   string `json:"role"`
+}
