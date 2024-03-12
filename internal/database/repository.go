@@ -9,7 +9,9 @@ import (
 
 type Repository interface {
 	CreateNewUser(ctx context.Context, user *entities.User) error
+	CreateWorkout(ctx context.Context, workout *entities.Workout) error
 	GetUserByEmail(ctx context.Context, email string) (*entities.User, error)
+	GetUserById(ctx context.Context, id uint) (*entities.User, error)
 	GetUsers(ctx context.Context) ([]entities.User, error)
 }
 
@@ -42,4 +44,18 @@ func (r *repository) GetUsers(ctx context.Context) ([]entities.User, error) {
 		return nil, tx.Error
 	}
 	return users, nil
+}
+
+func (r *repository) GetUserById(ctx context.Context, id uint) (*entities.User, error) {
+	user := new(entities.User)
+	tx := r.db.WithContext(ctx).Where(&entities.User{Model: gorm.Model{ID: id}}).First(&user)
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return user, tx.Error
+}
+
+func (r *repository) CreateWorkout(ctx context.Context, workout *entities.Workout) error {
+	tx := r.db.WithContext(ctx).Create(workout)
+	return tx.Error
 }

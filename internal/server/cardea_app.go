@@ -6,19 +6,21 @@ import (
 )
 
 type CardeaApp struct {
-	register *handler.RegisterHandler
-	login    *handler.LoginHandler
-	getUsers *handler.GetUsersHandler
-	logout   *handler.LogoutHandler
-	me       *handler.MeHandler
+	register      *handler.RegisterHandler
+	login         *handler.LoginHandler
+	getUsers      *handler.GetUsersHandler
+	logout        *handler.LogoutHandler
+	me            *handler.MeHandler
+	createWorkout *handler.CreateWorkoutHandler
 }
 
 func NewCardeaApp(repo database.Repository) *CardeaApp {
 	return &CardeaApp{
-		register: handler.NewRegisterHandler(repo),
-		login:    handler.NewLoginHandler(repo),
-		getUsers: handler.NewGetUsersHandler(repo),
-		logout:   handler.NewLogoutHandler(),
-		me:       handler.NewMeHandler(),
+		register:      handler.NewRegisterHandler(repo),
+		login:         handler.NewLoginHandler(repo),
+		getUsers:      handler.NewGetUsersHandler(repo),
+		logout:        handler.NewLogoutHandler(),
+		me:            handler.NewMeHandler(),
+		createWorkout: handler.NewCreateWorkoutHandler(repo),
 	}
 }

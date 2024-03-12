@@ -27,4 +27,6 @@ func (r *Router) InitializeRoute() {
 	user.Get("/", middleware.AuthMiddleware, middleware.RoleAdmin, r.cardeaApp.getUsers.Handle)
 	user.Get("/me", middleware.AuthMiddleware, r.cardeaApp.me.Handle)
 
+	workout := r.router.Group("/workout")
+	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, r.cardeaApp.createWorkout.Handle)
 }
