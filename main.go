@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/database"
-	"github.com/anilozgok/cardea-gp/internal/server"
+	"github.com/anilozgok/cardea-gp/internal/handler"
+	"github.com/anilozgok/cardea-gp/pkg/middleware"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
@@ -38,22 +42,63 @@ func main() {
 		New(configs).
 		Initialize()
 
-	appServer := server.NewAppServer(db, isLocalMode)
-	appServer.Start()
+	repo := database.NewRepository(db)
 
+	register := handler.NewRegisterHandler(repo)
+	login := handler.NewLoginHandler(repo)
+	logout := handler.NewLogoutHandler()
+	getUsers := handler.NewGetUsersHandler(repo)
+	me := handler.NewMeHandler()
+	createWorkout := handler.NewCreateWorkoutHandler(repo)
+
+	app := fiber.New()
+
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:5173",
+		AllowHeaders:     "Origin, Content-Type, Accept",
+		AllowCredentials: true,
+	}))
+
+	if isLocalMode {
+		app.Use(logger.New())
+	}
+
+	app.Get("/health", func(ctx *fiber.Ctx) error {
+		return ctx.Status(fiber.StatusOK).SendString("OK")
+	})
+
+	r := app.Group("/api/v1")
+	auth := r.Group("/auth")
+	auth.Post("/register", register.Handle)
+	auth.Post("/login", login.Handle)
+	auth.Post("/logout", logout.Handle)
+
+	user := r.Group("/user")
+	user.Get("/", middleware.AuthMiddleware, middleware.RoleAdmin, getUsers.Handle)
+	user.Get("/me", middleware.AuthMiddleware, me.Handle)
+
+	workout := r.Group("/workout")
+	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createWorkout.Handle)
+
+	go func() {
+		err = app.Listen(":8080")
+		if err != nil {
+			zap.L().Fatal("error while starting server", zap.Error(err))
+		}
+	}()
 	zap.L().Info("server started successfully on port :8080")
 
-	gracefulShutdown(appServer)
+	gracefulShutdown(app)
 }
 
-func gracefulShutdown(appServer *server.AppServer) {
+func gracefulShutdown(app *fiber.App) {
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, os.Interrupt, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 
 	<-signalCh
 
 	zap.L().Info("shutting down server")
-	if err := appServer.Shutdown(); err != nil {
+	if err := app.Shutdown(); err != nil {
 		zap.L().Error("error occurred while shutting down server", zap.Error(err))
 	}
 }

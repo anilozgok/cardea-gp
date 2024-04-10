@@ -28,7 +28,7 @@ func (h *CreateWorkoutHandler) Handle(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := validators.ValidateCreateWorkoutRequest(req); err != nil {
+	if err := validators.Validate(req); err != nil {
 		zap.L().Error("error while validating request body", zap.Error(err))
 		c.Status(fiber.StatusBadRequest)
 		return err

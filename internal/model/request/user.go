@@ -2,20 +2,19 @@ package request
 
 import "time"
 
-// TODO:: add validation for the request using validator
 type NewUserRequest struct {
-	Firstname   string    `json:"firstName"`
-	LastName    string    `json:"lastName"`
-	DateOfBirth time.Time `json:"dateOfBirth"`
-	Gender      string    `json:"gender"`
-	Height      int       `json:"height"`
-	Weight      float32   `json:"weight"`
-	Email       string    `json:"email"`
-	Password    string    `json:"password"`
-	Role        string    `json:"role"`
+	Firstname   string    `json:"firstName" validate:"required"`
+	LastName    string    `json:"lastName" validate:"required"`
+	DateOfBirth time.Time `json:"dateOfBirth" validate:"required"`
+	Gender      string    `json:"gender" validate:"required"`
+	Height      int       `json:"height" validate:"required"`
+	Weight      float32   `json:"weight" validate:"required"`
+	Email       string    `json:"email" validate:"required"`
+	Password    string    `json:"password" validate:"required"`
+	Role        string    `json:"role" validate:"required"`
 }
 
 type LoginRequest struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
 }
