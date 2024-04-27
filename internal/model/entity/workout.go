@@ -1,4 +1,4 @@
-package entities
+package entity
 
 import (
 	"gorm.io/gorm"
@@ -7,6 +7,7 @@ import (
 type Workout struct {
 	gorm.Model
 	UserId      uint
+	CoachId     uint
 	Name        string
 	Description string
 	Area        string

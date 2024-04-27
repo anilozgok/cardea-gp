@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/anilozgok/cardea-gp/internal/database"
-	"github.com/anilozgok/cardea-gp/internal/model/entities"
 	"github.com/anilozgok/cardea-gp/internal/model/response"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
@@ -24,13 +23,7 @@ func (h *GetUsersHandler) Handle(c *fiber.Ctx) error {
 		return err
 	}
 
-	res := mapToResponse(users)
-
-	return c.JSON(res)
-}
-
-func mapToResponse(users []entities.User) response.UserListResponse {
-	var userResponses []response.UserResponse
+	userResponses := make([]response.UserResponse, 0)
 	for _, u := range users {
 		userResponses = append(userResponses, response.UserResponse{
 			UserId:      uint32(u.ID),
@@ -44,5 +37,6 @@ func mapToResponse(users []entities.User) response.UserListResponse {
 			Role:        u.Role,
 		})
 	}
-	return response.UserListResponse{Users: userResponses}
+
+	return c.JSON(response.UserListResponse{Users: userResponses})
 }

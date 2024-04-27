@@ -3,7 +3,7 @@ package database
 import (
 	"fmt"
 	"github.com/anilozgok/cardea-gp/internal/config"
-	"github.com/anilozgok/cardea-gp/internal/model/entities"
+	"github.com/anilozgok/cardea-gp/internal/model/entity"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -49,6 +49,6 @@ func (d *DB) connect() (*gorm.DB, error) {
 
 func migrate(db *gorm.DB) error {
 	return db.AutoMigrate(
-		&entities.User{},
+		&entity.User{},
 	)
 }

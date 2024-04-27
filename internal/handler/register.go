@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/anilozgok/cardea-gp/internal/database"
-	"github.com/anilozgok/cardea-gp/internal/model/entities"
+	"github.com/anilozgok/cardea-gp/internal/model/entity"
 	"github.com/anilozgok/cardea-gp/internal/model/request"
 	"github.com/anilozgok/cardea-gp/internal/validators"
 	"github.com/gofiber/fiber/v2"
@@ -56,7 +56,7 @@ func (h *RegisterHandler) Handle(c *fiber.Ctx) error {
 		return errors.New("error while encrypting the password")
 	}
 
-	user := entities.User{
+	user := entity.User{
 		FirstName:   req.Firstname,
 		LastName:    req.LastName,
 		Email:       req.Email,

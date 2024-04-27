@@ -50,6 +50,8 @@ func main() {
 	getUsers := handler.NewGetUsersHandler(repo)
 	me := handler.NewMeHandler()
 	createWorkout := handler.NewCreateWorkoutHandler(repo)
+	listCoachWorkouts := handler.NewListCoachWorkoutHandler(repo)
+	listUserWorkouts := handler.NewListCoachWorkoutHandler(repo)
 
 	app := fiber.New()
 
@@ -76,9 +78,11 @@ func main() {
 	user := r.Group("/user")
 	user.Get("/", middleware.AuthMiddleware, middleware.RoleAdmin, getUsers.Handle)
 	user.Get("/me", middleware.AuthMiddleware, me.Handle)
+	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
 
 	workout := r.Group("/workout")
 	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createWorkout.Handle)
+	workout.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listCoachWorkouts.Handle)
 
 	go func() {
 		err = app.Listen(":8080")

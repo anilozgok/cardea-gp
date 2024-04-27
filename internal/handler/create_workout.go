@@ -3,7 +3,7 @@ package handler
 import (
 	"errors"
 	"github.com/anilozgok/cardea-gp/internal/database"
-	"github.com/anilozgok/cardea-gp/internal/model/entities"
+	"github.com/anilozgok/cardea-gp/internal/model/entity"
 	"github.com/anilozgok/cardea-gp/internal/model/request"
 	"github.com/anilozgok/cardea-gp/internal/validators"
 	"github.com/gofiber/fiber/v2"
@@ -47,8 +47,9 @@ func (h *CreateWorkoutHandler) Handle(c *fiber.Ctx) error {
 		return errors.New("user not exists")
 	}
 
-	workout := entities.Workout{
+	workout := entity.Workout{
 		UserId:      req.UserId,
+		CoachId:     c.Locals("userId").(uint),
 		Name:        req.Name,
 		Description: req.Description,
 		Area:        req.Area,
