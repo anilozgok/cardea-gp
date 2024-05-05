@@ -9,8 +9,18 @@ type Workout struct {
 	UserId      uint
 	CoachId     uint
 	Name        string
+	Exercise    uint
 	Description string
 	Area        string
 	Rep         int
 	Sets        int
+}
+
+type Exercise struct {
+	gorm.Model
+	BodyPart     string
+	Equipment    string
+	GifUrl       string
+	ExerciseName string
+	Target       string
 }

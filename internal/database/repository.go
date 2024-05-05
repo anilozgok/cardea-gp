@@ -15,6 +15,7 @@ type Repository interface {
 	GetUsers(ctx context.Context) ([]entity.User, error)
 	ListWorkoutByUserId(ctx context.Context, userId uint) ([]entity.Workout, error)
 	ListWorkoutByCoachId(ctx context.Context, coachId uint) ([]entity.Workout, error)
+	UpdatePassword(ctx context.Context, password string, user entity.User) error
 }
 
 type repository struct {
@@ -78,4 +79,11 @@ func (r *repository) ListWorkoutByCoachId(ctx context.Context, coachId uint) ([]
 		return nil, tx.Error
 	}
 	return workouts, nil
+}
+
+func (r *repository) UpdatePassword(ctx context.Context, password string, user entity.User) error {
+	user.Password = password
+	tx := r.db.WithContext(ctx).Save(user)
+
+	return tx.Error
 }

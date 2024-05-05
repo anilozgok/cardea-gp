@@ -50,5 +50,7 @@ func (d *DB) connect() (*gorm.DB, error) {
 func migrate(db *gorm.DB) error {
 	return db.AutoMigrate(
 		&entity.User{},
+		&entity.Workout{},
+		&entity.Exercise{},
 	)
 }

@@ -1,6 +1,8 @@
 package request
 
-import "time"
+import (
+	"time"
+)
 
 type NewUserRequest struct {
 	Firstname   string    `json:"firstName" validate:"required"`
@@ -15,6 +17,11 @@ type NewUserRequest struct {
 }
 
 type LoginRequest struct {
+	Email    string `json:"email" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type ForgotPassword struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
