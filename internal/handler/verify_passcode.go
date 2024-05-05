@@ -29,6 +29,8 @@ func (h *VerifyPasscodeHandler) Handle(c *fiber.Ctx) error {
 		return err
 	}
 
+	// TODO:: line 33 throws nil pointer because c.Locals(passcodeCreatedAt) returns nil interface
+	// TODO:: i think we cannot pass values from check-user's context to this request's context
 	passcodeCreatedAt := c.Locals("passcodeCreatedAt").(time.Time)
 	elapsed := time.Now().Sub(passcodeCreatedAt)
 

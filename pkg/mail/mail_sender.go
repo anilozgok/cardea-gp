@@ -1,6 +1,7 @@
 package mail
 
 import (
+	"fmt"
 	"go.uber.org/zap"
 	"net/smtp"
 )
@@ -26,7 +27,7 @@ func (m *MailServer) Send(to, message string) error {
 	auth := smtp.PlainAuth("", m.Email, m.Password, smtpHost)
 
 	// Sending email.
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, m.Email, []string{to}, []byte(message))
+	err := smtp.SendMail(fmt.Sprintf("%s:%s", smtpHost, smtpPort), auth, m.Email, []string{to}, []byte(message))
 	if err != nil {
 		zap.L().Error("Error while sending email", zap.Error(err))
 		return err

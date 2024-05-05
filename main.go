@@ -77,7 +77,7 @@ func main() {
 	auth.Post("/register", register.Handle)
 	auth.Post("/login", login.Handle)
 	auth.Post("/logout", logout.Handle)
-	auth.Get("/check-user/:email", checkUser.Handle)
+	auth.Get("/check-user", checkUser.Handle)
 	auth.Get("/verify-passcode", verifyPasscode.Handle)
 	auth.Put("/update-password", updatePassword.Handle)
 

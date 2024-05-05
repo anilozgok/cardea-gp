@@ -46,7 +46,7 @@ func (h *CheckUserHandler) Handle(c *fiber.Ctx) error {
 
 	mailServer := mail.NewMailServer(h.config.Secrets.EmailCredentials.Email, h.config.Secrets.EmailCredentials.Password)
 
-	message := fmt.Sprintf("Passcode: %d", passcode)
+	message := fmt.Sprintf("Your passcode is %d and it is valid for 3 minutes", passcode)
 
 	now := time.Now()
 	if err = mailServer.Send(email, message); err != nil {
@@ -59,5 +59,5 @@ func (h *CheckUserHandler) Handle(c *fiber.Ctx) error {
 	c.Locals("passcodeCreatedAt", now)
 	c.Locals("user", maybeUser)
 
-	return c.Next()
+	return c.SendStatus(fiber.StatusOK)
 }
