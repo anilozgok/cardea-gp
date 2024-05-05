@@ -21,7 +21,7 @@ func NewLoginHandler(repo database.Repository) *LoginHandler {
 }
 
 func (h *LoginHandler) Handle(c *fiber.Ctx) error {
-	req := new(request.LoginRequest)
+	req := new(request.Login)
 	if err := c.BodyParser(req); err != nil {
 		zap.L().Error("error while parsing request body", zap.Error(err))
 		c.Status(fiber.StatusBadRequest)

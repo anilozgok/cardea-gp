@@ -23,7 +23,7 @@ func NewRegisterHandler(repo database.Repository) *RegisterHandler {
 }
 
 func (h *RegisterHandler) Handle(c *fiber.Ctx) error {
-	req := new(request.NewUserRequest)
+	req := new(request.NewUser)
 	if err := c.BodyParser(req); err != nil {
 		zap.L().Error("error while parsing request body", zap.Error(err))
 		c.Status(fiber.StatusBadRequest)

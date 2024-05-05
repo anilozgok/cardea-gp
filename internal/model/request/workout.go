@@ -1,6 +1,6 @@
 package request
 
-type CreateWorkoutRequest struct {
+type CreateWorkout struct {
 	UserId      uint   `json:"userId" validate:"required"`
 	Name        string `json:"name" validate:"required"`
 	Exercise    uint   `json:"exercise" validate:"required"`

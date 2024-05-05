@@ -11,6 +11,11 @@ type Secrets struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	} `json:"cardeaDBCredentials"`
+
+	EmailCredentials struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 }
 
 type Config struct {

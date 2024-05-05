@@ -52,7 +52,9 @@ func main() {
 	createWorkout := handler.NewCreateWorkoutHandler(repo)
 	listCoachWorkouts := handler.NewListCoachWorkoutHandler(repo)
 	listUserWorkouts := handler.NewListCoachWorkoutHandler(repo)
-	forgotPasswordHandler := handler.NewForgotPasswordHandler(repo)
+	checkUser := handler.NewCheckUserHandler(repo, configs)
+	verifyPasscode := handler.NewVerifyPasscodeHandler()
+	updatePassword := handler.NewUpdatePasswordHandler(repo)
 
 	app := fiber.New()
 
@@ -75,7 +77,9 @@ func main() {
 	auth.Post("/register", register.Handle)
 	auth.Post("/login", login.Handle)
 	auth.Post("/logout", logout.Handle)
-	auth.Put("/update-password/:email", forgotPasswordHandler.Handle)
+	auth.Get("/check-user/:email", checkUser.Handle)
+	auth.Get("/verify-passcode", verifyPasscode.Handle)
+	auth.Put("/update-password", updatePassword.Handle)
 
 	user := r.Group("/user")
 	user.Get("/", middleware.AuthMiddleware, middleware.RoleAdmin, getUsers.Handle)

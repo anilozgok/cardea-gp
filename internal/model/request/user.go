@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type NewUserRequest struct {
+type NewUser struct {
 	Firstname   string    `json:"firstName" validate:"required"`
 	LastName    string    `json:"lastName" validate:"required"`
 	DateOfBirth time.Time `json:"dateOfBirth" validate:"required"`
@@ -16,12 +16,15 @@ type NewUserRequest struct {
 	Role        string    `json:"role" validate:"required"`
 }
 
-type LoginRequest struct {
+type Login struct {
 	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
 
 type ForgotPassword struct {
-	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
+}
+
+type VerifyPasscode struct {
+	Passcode int `json:"passcode" validate:"required"`
 }

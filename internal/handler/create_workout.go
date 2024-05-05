@@ -21,7 +21,7 @@ func NewCreateWorkoutHandler(repo database.Repository) *CreateWorkoutHandler {
 }
 
 func (h *CreateWorkoutHandler) Handle(c *fiber.Ctx) error {
-	req := new(request.CreateWorkoutRequest)
+	req := new(request.CreateWorkout)
 	if err := c.BodyParser(req); err != nil {
 		zap.L().Error("error while parsing request body", zap.Error(err))
 		c.Status(fiber.StatusBadRequest)
