@@ -6,6 +6,7 @@ import (
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/internal/handler"
 	"github.com/anilozgok/cardea-gp/pkg/middleware"
+	"github.com/anilozgok/cardea-gp/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -52,9 +53,11 @@ func main() {
 	createWorkout := handler.NewCreateWorkoutHandler(repo)
 	listCoachWorkouts := handler.NewListCoachWorkoutHandler(repo)
 	listUserWorkouts := handler.NewListCoachWorkoutHandler(repo)
-	checkUser := handler.NewCheckUserHandler(repo, configs)
-	verifyPasscode := handler.NewVerifyPasscodeHandler()
-	updatePassword := handler.NewUpdatePasswordHandler(repo)
+
+	fpCtx := new(utils.ForgotPasswordCtx)
+	checkUser := handler.NewCheckUserHandler(repo, configs, fpCtx)
+	verifyPasscode := handler.NewVerifyPasscodeHandler(fpCtx)
+	updatePassword := handler.NewUpdatePasswordHandler(repo, fpCtx)
 
 	app := fiber.New()
 

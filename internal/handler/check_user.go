@@ -5,6 +5,7 @@ import (
 	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/pkg/mail"
+	"github.com/anilozgok/cardea-gp/pkg/utils"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
 	"math/rand"
@@ -14,12 +15,14 @@ import (
 type CheckUserHandler struct {
 	repo   database.Repository
 	config *config.Config
+	fpCtx  *utils.ForgotPasswordCtx
 }
 
-func NewCheckUserHandler(repo database.Repository, config *config.Config) *CheckUserHandler {
+func NewCheckUserHandler(repo database.Repository, config *config.Config, fpCtx *utils.ForgotPasswordCtx) *CheckUserHandler {
 	return &CheckUserHandler{
 		repo:   repo,
 		config: config,
+		fpCtx:  fpCtx,
 	}
 }
 
@@ -55,9 +58,9 @@ func (h *CheckUserHandler) Handle(c *fiber.Ctx) error {
 		return err
 	}
 
-	c.Locals("passcode", passcode)
-	c.Locals("passcodeCreatedAt", now)
-	c.Locals("user", maybeUser)
+	h.fpCtx.Passcode = passcode
+	h.fpCtx.CreatedAt = now
+	h.fpCtx.User = *maybeUser
 
 	return c.SendStatus(fiber.StatusOK)
 }
