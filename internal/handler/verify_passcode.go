@@ -33,11 +33,6 @@ func (h *VerifyPasscodeHandler) Handle(c *fiber.Ctx) error {
 		return err
 	}
 
-	if h.fpCtx.Verified {
-		zap.L().Info("passcode already verified cannot use again.")
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
-
 	elapsed := time.Now().Sub(h.fpCtx.CreatedAt)
 
 	if elapsed.Seconds() > 181.00 {
@@ -50,8 +45,6 @@ func (h *VerifyPasscodeHandler) Handle(c *fiber.Ctx) error {
 		zap.L().Info("incorrect passcode")
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
-
-	h.fpCtx.Verified = true
 
 	return c.SendStatus(fiber.StatusOK)
 }

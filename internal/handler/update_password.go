@@ -23,10 +23,6 @@ func NewUpdatePasswordHandler(repo database.Repository, fpCtx *utils.ForgotPassw
 }
 
 func (h *UpdatePasswordHandler) Handle(c *fiber.Ctx) error {
-	if !h.fpCtx.Verified {
-		zap.L().Info("passcode is not verified")
-		return c.SendStatus(fiber.StatusBadRequest)
-	}
 
 	req := new(request.ForgotPassword)
 	if err := c.BodyParser(req); err != nil {
