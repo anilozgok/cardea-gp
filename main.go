@@ -81,7 +81,7 @@ func main() {
 	auth.Post("/login", login.Handle)
 	auth.Post("/logout", logout.Handle)
 	auth.Get("/check-user", checkUser.Handle)
-	auth.Get("/verify-passcode", verifyPasscode.Handle)
+	auth.Put("/verify-passcode", verifyPasscode.Handle)
 	auth.Put("/update-password", updatePassword.Handle)
 
 	user := r.Group("/user")
