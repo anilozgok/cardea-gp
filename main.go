@@ -59,6 +59,9 @@ func main() {
 	verifyPasscode := handler.NewVerifyPasscodeHandler(fpCtx)
 	updatePassword := handler.NewUpdatePasswordHandler(repo, fpCtx)
 
+	// Initialize Profile Handler
+	profileHandler := handler.NewProfileHandler(repo)
+
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
@@ -92,6 +95,13 @@ func main() {
 	workout := r.Group("/workout")
 	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createWorkout.Handle)
 	workout.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listCoachWorkouts.Handle)
+
+	// Profile routes
+	profile := r.Group("/profile")
+	profile.Post("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.CreateProfile)
+	profile.Get("/:user_id", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.GetProfile)
+	profile.Put("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.UpdateProfile)
+	profile.Post("/:user_id/photo", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.UploadPhoto)
 
 	go func() {
 		err = app.Listen(":8080")

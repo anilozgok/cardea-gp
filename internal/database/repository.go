@@ -16,6 +16,11 @@ type Repository interface {
 	ListWorkoutByUserId(ctx context.Context, userId uint) ([]entity.Workout, error)
 	ListWorkoutByCoachId(ctx context.Context, coachId uint) ([]entity.Workout, error)
 	UpdatePassword(ctx context.Context, password string, user entity.User) error
+	// profile related methods
+	CreateProfile(ctx context.Context, profile *entity.Profile) error
+	GetProfile(ctx context.Context, userID int64) (*entity.Profile, error)
+	UpdateProfile(ctx context.Context, profile *entity.Profile) error
+	AddPhoto(ctx context.Context, userID int64, photoURL string) error
 }
 
 type repository struct {
@@ -86,4 +91,37 @@ func (r *repository) UpdatePassword(ctx context.Context, password string, user e
 	tx := r.db.WithContext(ctx).Save(user)
 
 	return tx.Error
+}
+
+// Profile related methods
+
+func (r *repository) CreateProfile(ctx context.Context, profile *entity.Profile) error {
+	tx := r.db.WithContext(ctx).Create(profile)
+	return tx.Error
+}
+
+func (r *repository) GetProfile(ctx context.Context, userID int64) (*entity.Profile, error) {
+	profile := new(entity.Profile)
+	tx := r.db.WithContext(ctx).Where("user_id = ?", userID).First(profile)
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return profile, tx.Error
+}
+
+func (r *repository) UpdateProfile(ctx context.Context, profile *entity.Profile) error {
+	tx := r.db.WithContext(ctx).Save(profile)
+	return tx.Error
+}
+
+func (r *repository) AddPhoto(ctx context.Context, userID int64, photoURL string) error {
+	profile, err := r.GetProfile(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if profile == nil {
+		return errors.New("profile not found")
+	}
+	profile.Photos = append(profile.Photos, photoURL)
+	return r.UpdateProfile(ctx, profile)
 }
