@@ -69,6 +69,16 @@ func main() {
 		AllowCredentials: true,
 	}))
 
+	// Ensure the images directory exists
+	if _, err := os.Stat("./images"); os.IsNotExist(err) {
+		err := os.Mkdir("./images", os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	app.Static("/uploads", "./uploads")
+
 	if isLocalMode {
 		app.Use(logger.New())
 	}

@@ -16,11 +16,10 @@ type Repository interface {
 	ListWorkoutByUserId(ctx context.Context, userId uint) ([]entity.Workout, error)
 	ListWorkoutByCoachId(ctx context.Context, coachId uint) ([]entity.Workout, error)
 	UpdatePassword(ctx context.Context, password string, user entity.User) error
-	// profile related methods
 	CreateProfile(ctx context.Context, profile *entity.Profile) error
 	GetProfileByUserId(ctx context.Context, userId uint) (*entity.Profile, error)
 	UpdateProfile(ctx context.Context, profile *entity.Profile) error
-	AddPhoto(ctx context.Context, userId uint, photoURL string) error
+	AddPhoto(ctx context.Context, photo *entity.Image) error
 }
 
 type repository struct {
@@ -114,17 +113,7 @@ func (r *repository) UpdateProfile(ctx context.Context, profile *entity.Profile)
 	return tx.Error
 }
 
-func (r *repository) AddPhoto(ctx context.Context, userId uint, photoURL string) error {
-	profile, err := r.GetProfileByUserId(ctx, userId)
-	if err != nil {
-		return err
-	}
-
-	if profile == nil {
-		return errors.New("profile not found")
-	}
-
-	profile.Photos = append(profile.Photos, photoURL)
-
-	return r.UpdateProfile(ctx, profile)
+func (r *repository) AddPhoto(ctx context.Context, photo *entity.Image) error {
+	tx := r.db.WithContext(ctx).Create(photo)
+	return tx.Error
 }

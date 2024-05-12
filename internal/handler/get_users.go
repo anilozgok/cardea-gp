@@ -31,8 +31,6 @@ func (h *GetUsersHandler) Handle(c *fiber.Ctx) error {
 			FirstName:   u.FirstName,
 			LastName:    u.LastName,
 			Gender:      u.Gender,
-			Height:      u.Height,
-			Weight:      u.Weight,
 			DateOfBirth: u.DateOfBirth,
 			Role:        u.Role,
 		})

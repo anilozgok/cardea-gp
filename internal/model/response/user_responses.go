@@ -8,8 +8,6 @@ type UserResponse struct {
 	FirstName   string    `json:"firstName"`
 	LastName    string    `json:"lastName"`
 	Gender      string    `json:"gender"`
-	Height      int       `json:"height"`
-	Weight      float32   `json:"weight"`
 	DateOfBirth time.Time `json:"dateOfBirth"`
 	Role        string    `json:"role"`
 }

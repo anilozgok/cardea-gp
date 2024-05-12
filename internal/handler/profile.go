@@ -20,6 +20,8 @@ func NewProfileHandler(repo database.Repository) *ProfileHandler {
 }
 
 func (h *ProfileHandler) CreateProfile(c *fiber.Ctx) error {
+	userId := c.Locals("userId").(uint)
+
 	req := new(request.CreateProfileRequest)
 	if err := c.BodyParser(req); err != nil {
 		zap.L().Error("error while parsing request body", zap.Error(err))
@@ -31,13 +33,25 @@ func (h *ProfileHandler) CreateProfile(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
+	maybeProfile, err := h.repo.GetProfileByUserId(c.Context(), userId)
+	if err != nil {
+		zap.L().Error("error while getting profile", zap.Error(err))
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	if maybeProfile != nil {
+		zap.L().Error("profile already exists", zap.Uint("userId", userId))
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
 	profile := &entity.Profile{
-		UserId:            req.UserId,
+		UserId:            userId,
 		Bio:               req.Bio,
+		Height:            req.Height,
+		Weight:            req.Weight,
 		ProfilePictureURL: req.ProfilePicture,
 		Experience:        req.Experience,
 		Specialization:    req.Specialization,
-		Photos:            req.Photos,
 	}
 
 	if err := h.repo.CreateProfile(c.Context(), profile); err != nil {
@@ -46,30 +60,6 @@ func (h *ProfileHandler) CreateProfile(c *fiber.Ctx) error {
 	}
 
 	return c.SendStatus(fiber.StatusOK)
-}
-
-func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
-	userId := c.Locals("userId").(uint)
-
-	profile, err := h.repo.GetProfileByUserId(c.Context(), userId)
-	if err != nil {
-		zap.L().Error("error while getting profile", zap.Error(err))
-		return c.SendStatus(fiber.StatusInternalServerError)
-	}
-
-	if profile == nil {
-		zap.L().Error("profile not found", zap.Uint("userId", userId))
-		return c.SendStatus(fiber.StatusNotFound)
-	}
-
-	return c.JSON(response.ProfileResponse{
-		UserId:         profile.UserId,
-		Bio:            profile.Bio,
-		ProfilePicture: profile.ProfilePictureURL,
-		Experience:     profile.Experience,
-		Specialization: profile.Specialization,
-		Photos:         profile.Photos,
-	})
 }
 
 func (h *ProfileHandler) UpdateProfile(c *fiber.Ctx) error {
@@ -98,10 +88,11 @@ func (h *ProfileHandler) UpdateProfile(c *fiber.Ctx) error {
 	}
 
 	profile.Bio = req.Bio
+	profile.Height = req.Height
+	profile.Weight = req.Weight
 	profile.ProfilePictureURL = req.ProfilePicture
 	profile.Experience = req.Experience
 	profile.Specialization = req.Specialization
-	profile.Photos = req.Photos
 
 	if err := h.repo.UpdateProfile(c.Context(), profile); err != nil {
 		zap.L().Error("error while updating profile", zap.Error(err))
@@ -111,24 +102,54 @@ func (h *ProfileHandler) UpdateProfile(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusOK)
 }
 
+func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
+	userId := c.Locals("userId").(uint)
+
+	profile, err := h.repo.GetProfileByUserId(c.Context(), userId)
+	if err != nil {
+		zap.L().Error("error while getting profile", zap.Error(err))
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	if profile == nil {
+		zap.L().Error("profile not found", zap.Uint("userId", userId))
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+
+	return c.JSON(response.ProfileResponse{
+		UserId:         profile.UserId,
+		Bio:            profile.Bio,
+		Height:         profile.Height,
+		Weight:         profile.Weight,
+		ProfilePicture: profile.ProfilePictureURL,
+		Experience:     profile.Experience,
+		Specialization: profile.Specialization,
+	})
+}
+
 func (h *ProfileHandler) UploadPhoto(c *fiber.Ctx) error {
 	userId := c.Locals("userId").(uint)
 
-	file, err := c.FormFile("photo")
+	file, err := c.FormFile("image")
 	if err != nil {
 		zap.L().Error("no file is received", zap.Error(err))
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	// Save the file to a specific directory
 	filePath := fmt.Sprintf("uploads/%d/%s", userId, file.Filename)
-	if err := c.SaveFile(file, filePath); err != nil {
+
+	if err = c.SaveFile(file, filePath); err != nil {
 		zap.L().Error("failed to upload file", zap.Error(err))
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	// Update the user's profile with the new photo URL
-	if err := h.repo.AddPhoto(c.Context(), userId, filePath); err != nil {
+	photo := &entity.Image{
+		UserId:    userId,
+		ImageName: file.Filename,
+		ImagePath: filePath,
+	}
+
+	if err = h.repo.AddPhoto(c.Context(), photo); err != nil {
 		zap.L().Error("failed to update profile with new photo", zap.Error(err))
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}

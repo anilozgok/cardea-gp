@@ -53,5 +53,6 @@ func migrate(db *gorm.DB) error {
 		&entity.Workout{},
 		&entity.Exercise{},
 		&entity.Profile{},
+		&entity.Image{},
 	)
 }
