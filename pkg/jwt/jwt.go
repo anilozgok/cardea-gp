@@ -8,7 +8,7 @@ import (
 )
 
 type Claims struct {
-	UserId uint32 `json:"userId"`
+	UserId uint   `json:"userId"`
 	Email  string `json:"email"`
 	Role   string `json:"role"`
 	jwt.RegisteredClaims
@@ -16,7 +16,7 @@ type Claims struct {
 
 func CreateToken(opts Opts) (string, error) {
 	claims := Claims{
-		UserId: opts.UserId,
+		UserId: uint(opts.UserId),
 		Email:  opts.Email,
 		Role:   opts.Role,
 		RegisteredClaims: jwt.RegisteredClaims{

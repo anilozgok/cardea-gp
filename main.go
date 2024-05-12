@@ -52,12 +52,14 @@ func main() {
 	me := handler.NewMeHandler()
 	createWorkout := handler.NewCreateWorkoutHandler(repo)
 	listCoachWorkouts := handler.NewListCoachWorkoutHandler(repo)
-	listUserWorkouts := handler.NewListCoachWorkoutHandler(repo)
+	listUserWorkouts := handler.NewListUserWorkoutHandler(repo)
 
 	fpCtx := new(utils.ForgotPasswordCtx)
 	checkUser := handler.NewCheckUserHandler(repo, configs, fpCtx)
 	verifyPasscode := handler.NewVerifyPasscodeHandler(fpCtx)
 	updatePassword := handler.NewUpdatePasswordHandler(repo, fpCtx)
+
+	profileHandler := handler.NewProfileHandler(repo)
 
 	app := fiber.New()
 
@@ -66,6 +68,8 @@ func main() {
 		AllowHeaders:     "Origin, Content-Type, Accept",
 		AllowCredentials: true,
 	}))
+
+	app.Static("/uploads", "./uploads")
 
 	if isLocalMode {
 		app.Use(logger.New())
@@ -92,6 +96,12 @@ func main() {
 	workout := r.Group("/workout")
 	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createWorkout.Handle)
 	workout.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listCoachWorkouts.Handle)
+
+	profile := r.Group("/profile")
+	profile.Post("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.CreateProfile)
+	profile.Get("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.GetProfile)
+	profile.Put("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.UpdateProfile)
+	profile.Post("/upload-photo", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.UploadPhoto)
 
 	go func() {
 		err = app.Listen(":8080")

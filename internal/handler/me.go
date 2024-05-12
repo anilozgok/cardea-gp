@@ -15,7 +15,7 @@ func NewMeHandler() *MeHandler {
 func (h *MeHandler) Handle(c *fiber.Ctx) error {
 	return c.JSON(
 		response.MeResponse{
-			UserId: c.Locals("userId").(uint32),
+			UserId: c.Locals("userId").(uint),
 			Email:  c.Locals("email").(string),
 			Role:   c.Locals("role").(string),
 		},

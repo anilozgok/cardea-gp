@@ -46,6 +46,17 @@ func (h *LoginHandler) Handle(c *fiber.Ctx) error {
 		return errors.New("user not found")
 	}
 
+	maybeProfile, err := h.repo.GetProfileByUserId(c.Context(), user.ID)
+	if err != nil {
+		zap.L().Error("error while getting profile", zap.Error(err))
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	c.Set("has-profile", "false")
+	if maybeProfile != nil {
+		c.Set("has-profile", "true")
+	}
+
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		zap.L().Error("invalid credentials", zap.Error(err))
 		c.Status(fiber.StatusBadRequest)

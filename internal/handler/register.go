@@ -61,8 +61,6 @@ func (h *RegisterHandler) Handle(c *fiber.Ctx) error {
 		LastName:    req.LastName,
 		Email:       req.Email,
 		Password:    string(hashedPassword),
-		Height:      req.Height,
-		Weight:      req.Weight,
 		Gender:      req.Gender,
 		DateOfBirth: req.DateOfBirth,
 		Role:        strings.ToLower(req.Role),
