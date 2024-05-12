@@ -9,6 +9,7 @@ import (
 	"github.com/anilozgok/cardea-gp/internal/validators"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
+	"os"
 )
 
 type ProfileHandler struct {
@@ -143,6 +144,13 @@ func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
 }
 
 func (h *ProfileHandler) UploadPhoto(c *fiber.Ctx) error {
+	if _, err := os.Stat("./uploads"); os.IsNotExist(err) {
+		err := os.Mkdir("./uploads", os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+	}
+
 	userId := c.Locals("userId").(uint)
 
 	file, err := c.FormFile("image")
@@ -151,7 +159,8 @@ func (h *ProfileHandler) UploadPhoto(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusBadRequest)
 	}
 
-	filePath := fmt.Sprintf("uploads/%d/%s", userId, file.Filename)
+	fileName := fmt.Sprintf("%d_%s", userId, file.Filename)
+	filePath := fmt.Sprintf("./uploads/%s", fileName)
 
 	if err = c.SaveFile(file, filePath); err != nil {
 		zap.L().Error("failed to upload file", zap.Error(err))
@@ -160,7 +169,7 @@ func (h *ProfileHandler) UploadPhoto(c *fiber.Ctx) error {
 
 	photo := &entity.Image{
 		UserId:    userId,
-		ImageName: file.Filename,
+		ImageName: fileName,
 		ImagePath: filePath,
 	}
 

@@ -52,9 +52,9 @@ func (h *LoginHandler) Handle(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	c.Append("has-profile", "false")
+	c.Set("has-profile", "false")
 	if maybeProfile != nil {
-		c.Append("has-profile", "true")
+		c.Set("has-profile", "true")
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {

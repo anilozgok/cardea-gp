@@ -69,14 +69,6 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	// Ensure the images directory exists
-	if _, err := os.Stat("./uploads"); os.IsNotExist(err) {
-		err := os.Mkdir("./uploads", os.ModePerm)
-		if err != nil {
-			panic(err)
-		}
-	}
-
 	app.Static("/uploads", "./uploads")
 
 	if isLocalMode {
@@ -105,7 +97,6 @@ func main() {
 	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createWorkout.Handle)
 	workout.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listCoachWorkouts.Handle)
 
-	// Profile routes
 	profile := r.Group("/profile")
 	profile.Post("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.CreateProfile)
 	profile.Get("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.GetProfile)
