@@ -52,7 +52,7 @@ func main() {
 	me := handler.NewMeHandler()
 	createWorkout := handler.NewCreateWorkoutHandler(repo)
 	listCoachWorkouts := handler.NewListCoachWorkoutHandler(repo)
-	listUserWorkouts := handler.NewListCoachWorkoutHandler(repo)
+	listUserWorkouts := handler.NewListUserWorkoutHandler(repo)
 
 	fpCtx := new(utils.ForgotPasswordCtx)
 	checkUser := handler.NewCheckUserHandler(repo, configs, fpCtx)
@@ -70,8 +70,8 @@ func main() {
 	}))
 
 	// Ensure the images directory exists
-	if _, err := os.Stat("./images"); os.IsNotExist(err) {
-		err := os.Mkdir("./images", os.ModePerm)
+	if _, err := os.Stat("./uploads"); os.IsNotExist(err) {
+		err := os.Mkdir("./uploads", os.ModePerm)
 		if err != nil {
 			panic(err)
 		}

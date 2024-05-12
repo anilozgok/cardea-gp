@@ -105,25 +105,40 @@ func (h *ProfileHandler) UpdateProfile(c *fiber.Ctx) error {
 func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
 	userId := c.Locals("userId").(uint)
 
-	profile, err := h.repo.GetProfileByUserId(c.Context(), userId)
+	maybeUser, err := h.repo.GetUserById(c.Context(), userId)
 	if err != nil {
-		zap.L().Error("error while getting profile", zap.Error(err))
+		zap.L().Error("error while getting user", zap.Error(err))
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	if profile == nil {
-		zap.L().Error("profile not found", zap.Uint("userId", userId))
+	if maybeUser == nil {
+		zap.L().Error("user not found", zap.Uint("userId", userId))
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+
+	maybeProfile, err := h.repo.GetProfileByUserId(c.Context(), userId)
+	if err != nil {
+		zap.L().Error("error while getting maybeProfile", zap.Error(err))
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	if maybeProfile == nil {
+		zap.L().Error("maybeProfile not found", zap.Uint("userId", userId))
 		return c.SendStatus(fiber.StatusNotFound)
 	}
 
 	return c.JSON(response.ProfileResponse{
-		UserId:         profile.UserId,
-		Bio:            profile.Bio,
-		Height:         profile.Height,
-		Weight:         profile.Weight,
-		ProfilePicture: profile.ProfilePictureURL,
-		Experience:     profile.Experience,
-		Specialization: profile.Specialization,
+		FirstName:      maybeUser.FirstName,
+		LastName:       maybeUser.LastName,
+		Email:          maybeUser.Email,
+		Gender:         maybeUser.Gender,
+		DateOfBirth:    maybeUser.DateOfBirth,
+		Bio:            maybeProfile.Bio,
+		Height:         maybeProfile.Height,
+		Weight:         maybeProfile.Weight,
+		ProfilePicture: maybeProfile.ProfilePictureURL,
+		Experience:     maybeProfile.Experience,
+		Specialization: maybeProfile.Specialization,
 	})
 }
 
