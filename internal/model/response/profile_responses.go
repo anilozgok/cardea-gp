@@ -1,10 +1,9 @@
 package response
 
 type ProfileResponse struct {
-	ID             int64    `json:"id"`
-	UserID         int64    `json:"user_id"`
+	UserId         uint     `json:"userId"`
 	Bio            string   `json:"bio"`
-	ProfilePicture string   `json:"profile_picture"`
+	ProfilePicture string   `json:"profilePicture"`
 	Experience     string   `json:"experience"`
 	Specialization string   `json:"specializations"`
 	Photos         []string `json:"photos"`

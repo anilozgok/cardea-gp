@@ -18,9 +18,9 @@ type Repository interface {
 	UpdatePassword(ctx context.Context, password string, user entity.User) error
 	// profile related methods
 	CreateProfile(ctx context.Context, profile *entity.Profile) error
-	GetProfile(ctx context.Context, userID int64) (*entity.Profile, error)
+	GetProfileByUserId(ctx context.Context, userId uint) (*entity.Profile, error)
 	UpdateProfile(ctx context.Context, profile *entity.Profile) error
-	AddPhoto(ctx context.Context, userID int64, photoURL string) error
+	AddPhoto(ctx context.Context, userId uint, photoURL string) error
 }
 
 type repository struct {
@@ -100,9 +100,9 @@ func (r *repository) CreateProfile(ctx context.Context, profile *entity.Profile)
 	return tx.Error
 }
 
-func (r *repository) GetProfile(ctx context.Context, userID int64) (*entity.Profile, error) {
+func (r *repository) GetProfileByUserId(ctx context.Context, userId uint) (*entity.Profile, error) {
 	profile := new(entity.Profile)
-	tx := r.db.WithContext(ctx).Where("user_id = ?", userID).First(profile)
+	tx := r.db.WithContext(ctx).Where(&entity.Profile{UserId: userId}).First(profile)
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return nil, nil
 	}
@@ -114,14 +114,17 @@ func (r *repository) UpdateProfile(ctx context.Context, profile *entity.Profile)
 	return tx.Error
 }
 
-func (r *repository) AddPhoto(ctx context.Context, userID int64, photoURL string) error {
-	profile, err := r.GetProfile(ctx, userID)
+func (r *repository) AddPhoto(ctx context.Context, userId uint, photoURL string) error {
+	profile, err := r.GetProfileByUserId(ctx, userId)
 	if err != nil {
 		return err
 	}
+
 	if profile == nil {
 		return errors.New("profile not found")
 	}
+
 	profile.Photos = append(profile.Photos, photoURL)
+
 	return r.UpdateProfile(ctx, profile)
 }

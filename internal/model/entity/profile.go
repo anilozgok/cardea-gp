@@ -1,8 +1,10 @@
 package entity
 
+import "gorm.io/gorm"
+
 type Profile struct {
-	ID                int64    `json:"id"`
-	UserID            int64    `json:"user_id"`
+	gorm.Model
+	UserId            uint     `json:"user_id"`
 	Bio               string   `json:"bio"`
 	ProfilePictureURL string   `json:"profile_picture_url"`
 	Experience        string   `json:"experience"`
