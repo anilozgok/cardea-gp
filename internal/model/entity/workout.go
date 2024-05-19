@@ -18,9 +18,9 @@ type Workout struct {
 
 type Exercise struct {
 	gorm.Model
-	BodyPart     string
-	Equipment    string
-	GifUrl       string
-	ExerciseName string
-	Target       string
+	Name      string
+	BodyPart  string
+	Target    string
+	Equipment string
+	Gif       string
 }

@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/model/entity"
+	"github.com/anilozgok/cardea-gp/pkg/reader"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type DB struct {
@@ -28,6 +30,11 @@ func (d *DB) Initialize() *gorm.DB {
 	err = migrate(db)
 	if err != nil {
 		zap.L().Fatal("failed to migrate to cardea db", zap.Error(err))
+	}
+
+	err = injectInitData(db)
+	if err != nil {
+		zap.L().Fatal("failed to inject initial data to cardea db", zap.Error(err))
 	}
 
 	zap.L().Info("database initialized successfully")
@@ -55,4 +62,46 @@ func migrate(db *gorm.DB) error {
 		&entity.Profile{},
 		&entity.Image{},
 	)
+}
+
+func injectInitData(db *gorm.DB) error {
+	rows, err := reader.CSV("exercise.csv")
+	if err != nil {
+		return err
+	}
+
+	exercises := make([]entity.Exercise, 0)
+
+	for i, r := range rows {
+		if i == 0 {
+			continue
+		}
+
+		convertedGiftURL := convertGIFURL(r[2])
+
+		exercise := entity.Exercise{
+			Name:      r[3],
+			BodyPart:  r[0],
+			Target:    r[4],
+			Equipment: r[1],
+			Gif:       convertedGiftURL,
+		}
+
+		exercises = append(exercises, exercise)
+	}
+
+	tx := db.CreateInBatches(&exercises, 100)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
+}
+
+func convertGIFURL(oldURL string) string {
+	// converts gif url to embedded gif url format like below
+	// https://media0.giphy.com/media/vvzFNc1kRSqTzrFLOT/giphy.gif
+	// https://giphy.com/embed/vvzFNc1kRSqTzrFLOT
+	splits := strings.Split(oldURL, "/")
+	return fmt.Sprintf("https://giphy.com/embed/%s", splits[len(splits)-2])
 }
