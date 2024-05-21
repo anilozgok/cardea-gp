@@ -90,7 +90,13 @@ func injectInitData(db *gorm.DB) error {
 		exercises = append(exercises, exercise)
 	}
 
-	tx := db.CreateInBatches(&exercises, 100)
+	// truncate table (soft deletes the existing records and overrides new records)
+	tx := db.Exec("TRUNCATE TABLE exercises")
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	tx = db.CreateInBatches(&exercises, 100)
 	if tx.Error != nil {
 		return tx.Error
 	}

@@ -29,7 +29,9 @@ func (h *ListCoachWorkoutHandler) Handle(c *fiber.Ctx) error {
 
 	res := make([]response.WorkoutResponse, 0)
 	for _, w := range workouts {
+
 		res = append(res, response.WorkoutResponse{
+			WorkoutId:   w.ID,
 			UserId:      w.UserId,
 			CoachId:     w.CoachId,
 			Name:        w.Name,

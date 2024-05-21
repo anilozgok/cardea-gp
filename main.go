@@ -61,6 +61,11 @@ func main() {
 
 	profileHandler := handler.NewProfileHandler(repo)
 
+	updateWorkout := handler.NewUpdateWorkoutHandler(repo)
+	deleteWorkout := handler.NewDeleteWorkoutHandler(repo)
+
+	listExercises := handler.NewListExercisesHandler(repo)
+
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
@@ -71,9 +76,7 @@ func main() {
 
 	app.Static("/uploads", "./uploads")
 
-	if isLocalMode {
-		app.Use(logger.New())
-	}
+	app.Use(logger.New())
 
 	app.Get("/health", func(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusOK).SendString("OK")
@@ -96,6 +99,9 @@ func main() {
 	workout := r.Group("/workout")
 	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createWorkout.Handle)
 	workout.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listCoachWorkouts.Handle)
+	workout.Put("/", middleware.AuthMiddleware, middleware.RoleCoach, updateWorkout.Handle)
+	workout.Delete("/", middleware.AuthMiddleware, middleware.RoleCoach, deleteWorkout.Handle)
+	workout.Get("/exercises", middleware.AuthMiddleware, middleware.RoleCoach, listExercises.Handle)
 
 	profile := r.Group("/profile")
 	profile.Post("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.CreateProfile)

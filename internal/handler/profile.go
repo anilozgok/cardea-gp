@@ -119,12 +119,12 @@ func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
 
 	maybeProfile, err := h.repo.GetProfileByUserId(c.Context(), userId)
 	if err != nil {
-		zap.L().Error("error while getting maybeProfile", zap.Error(err))
+		zap.L().Error("error while getting profile", zap.Error(err))
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
 	if maybeProfile == nil {
-		zap.L().Error("maybeProfile not found", zap.Uint("userId", userId))
+		zap.L().Error("profile not found", zap.Uint("userId", userId))
 		return c.SendStatus(fiber.StatusNotFound)
 	}
 

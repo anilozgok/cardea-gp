@@ -20,6 +20,11 @@ type Repository interface {
 	GetProfileByUserId(ctx context.Context, userId uint) (*entity.Profile, error)
 	UpdateProfile(ctx context.Context, profile *entity.Profile) error
 	AddPhoto(ctx context.Context, photo *entity.Image) error
+	GetWorkoutById(ctx context.Context, id uint) (*entity.Workout, error)
+	UpdateWorkout(ctx context.Context, workout entity.Workout) error
+	DeleteWorkout(ctx context.Context, id uint) error
+	ListExercises(ctx context.Context) ([]entity.Exercise, error)
+	GetExerciseById(ctx context.Context, id uint) (*entity.Exercise, error)
 }
 
 type repository struct {
@@ -116,4 +121,41 @@ func (r *repository) UpdateProfile(ctx context.Context, profile *entity.Profile)
 func (r *repository) AddPhoto(ctx context.Context, photo *entity.Image) error {
 	tx := r.db.WithContext(ctx).Create(photo)
 	return tx.Error
+}
+
+func (r *repository) GetWorkoutById(ctx context.Context, id uint) (*entity.Workout, error) {
+	workout := new(entity.Workout)
+	tx := r.db.WithContext(ctx).Where(&entity.Workout{Model: gorm.Model{ID: id}}).First(workout)
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return workout, tx.Error
+}
+
+func (r *repository) UpdateWorkout(ctx context.Context, workout entity.Workout) error {
+	tx := r.db.WithContext(ctx).Save(workout)
+	return tx.Error
+}
+
+func (r *repository) DeleteWorkout(ctx context.Context, id uint) error {
+	tx := r.db.WithContext(ctx).Delete(&entity.Workout{}, id)
+	return tx.Error
+}
+
+func (r *repository) ListExercises(ctx context.Context) ([]entity.Exercise, error) {
+	var exercises []entity.Exercise
+	tx := r.db.WithContext(ctx).Find(&exercises)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return exercises, nil
+}
+
+func (r *repository) GetExerciseById(ctx context.Context, id uint) (*entity.Exercise, error) {
+	exercise := new(entity.Exercise)
+	tx := r.db.WithContext(ctx).Find(&entity.Exercise{Model: gorm.Model{ID: id}}).First(exercise)
+	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return exercise, tx.Error
 }

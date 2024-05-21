@@ -1,6 +1,7 @@
 package response
 
 type WorkoutResponse struct {
+	WorkoutId   uint             `json:"workoutId"`
 	UserId      uint             `json:"userId"`
 	CoachId     uint             `json:"coachId"`
 	Name        string           `json:"name"`
@@ -15,9 +16,10 @@ type WorkoutListResponse struct {
 }
 
 type ExerciseResponse struct {
-	BodyPart     string `json:"bodyPart"`
-	Equipment    string `json:"equipment"`
-	GifUrl       string `json:"gifUrl"`
-	ExerciseName string `json:"exerciseName"`
-	Target       string `json:"target"`
+	ExerciseId uint   `json:"exerciseId"`
+	BodyPart   string `json:"bodyPart"`
+	Equipment  string `json:"equipment"`
+	Gif        string `json:"gifUrl"`
+	Name       string `json:"exerciseName"`
+	Target     string `json:"target"`
 }

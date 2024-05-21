@@ -63,5 +63,5 @@ func (h *CreateWorkoutHandler) Handle(c *fiber.Ctx) error {
 		return err
 	}
 
-	return nil
+	return c.SendStatus(fiber.StatusOK)
 }

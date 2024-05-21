@@ -9,3 +9,9 @@ type CreateWorkout struct {
 	Rep         int    `json:"rep" validate:"required"`
 	Sets        int    `json:"sets" validate:"required"`
 }
+
+type UpdateWorkout struct {
+	WorkoutId uint `json:"workoutId" validate:"required"`
+	Rep       int  `json:"rep" validate:"required"`
+	Sets      int  `json:"sets" validate:"required"`
+}
