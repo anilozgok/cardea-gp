@@ -18,15 +18,15 @@ func NewListExercisesHandler(repo database.Repository) *ListExercisesHandler {
 }
 
 func (h *ListExercisesHandler) Handle(c *fiber.Ctx) error {
-	exercises, err := h.repo.ListExercises(c.Context())
+	exercisesList, err := h.repo.ListExercises(c.Context())
 	if err != nil {
 		zap.L().Error("error while listing exercises", zap.Error(err))
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	res := make([]response.ExerciseResponse, 0)
-	for _, e := range exercises {
-		res = append(res, response.ExerciseResponse{
+	exercises := make([]response.ExerciseResponse, 0)
+	for _, e := range exercisesList {
+		exercises = append(exercises, response.ExerciseResponse{
 			ExerciseId: e.ID,
 			BodyPart:   e.BodyPart,
 			Equipment:  e.Equipment,
@@ -34,6 +34,10 @@ func (h *ListExercisesHandler) Handle(c *fiber.Ctx) error {
 			Name:       e.Name,
 			Target:     e.Target,
 		})
+	}
+
+	res := response.ExerciseListResponse{
+		Exercises: exercises,
 	}
 
 	return c.JSON(res)

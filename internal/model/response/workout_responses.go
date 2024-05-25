@@ -1,18 +1,22 @@
 package response
 
 type WorkoutResponse struct {
-	WorkoutId   uint             `json:"workoutId"`
-	UserId      uint             `json:"userId"`
-	CoachId     uint             `json:"coachId"`
-	Name        string           `json:"name"`
-	Exercise    ExerciseResponse `json:"exercise"`
-	Description string           `json:"description"`
-	Area        string           `json:"area"`
-	Rep         int              `json:"rep"`
-	Sets        int              `json:"sets"`
+	WorkoutId   uint   `json:"workoutId"`
+	UserId      uint   `json:"userId"`
+	CoachId     uint   `json:"coachId"`
+	Name        string `json:"name"`
+	Exercise    uint   `json:"exercise"`
+	Description string `json:"description"`
+	Area        string `json:"area"`
+	Rep         int    `json:"rep"`
+	Sets        int    `json:"sets"`
 }
 type WorkoutListResponse struct {
 	Workouts []WorkoutResponse `json:"workouts"`
+}
+
+type ExerciseListResponse struct {
+	Exercises []ExerciseResponse `json:"exercises"`
 }
 
 type ExerciseResponse struct {

@@ -51,6 +51,7 @@ func (h *CreateWorkoutHandler) Handle(c *fiber.Ctx) error {
 		UserId:      req.UserId,
 		CoachId:     c.Locals("userId").(uint),
 		Name:        req.Name,
+		Exercise:    req.Exercise,
 		Description: req.Description,
 		Area:        req.Area,
 		Rep:         req.Rep,

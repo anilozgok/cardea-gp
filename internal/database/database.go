@@ -90,8 +90,8 @@ func injectInitData(db *gorm.DB) error {
 		exercises = append(exercises, exercise)
 	}
 
-	// truncate table (soft deletes the existing records and overrides new records)
-	tx := db.Exec("TRUNCATE TABLE exercises")
+	// truncate table (deletes the existing records and overrides new records)
+	tx := db.Exec("TRUNCATE ONLY exercises RESTART IDENTITY;")
 	if tx.Error != nil {
 		return tx.Error
 	}
