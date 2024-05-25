@@ -66,6 +66,8 @@ func main() {
 
 	listExercises := handler.NewListExercisesHandler(repo)
 
+	listUsers := handler.NewListUsersHandler(repo)
+
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
@@ -92,7 +94,8 @@ func main() {
 	auth.Put("/update-password", updatePassword.Handle)
 
 	user := r.Group("/user")
-	user.Get("/", middleware.AuthMiddleware, middleware.RoleAdmin, getUsers.Handle)
+	user.Get("/all", middleware.AuthMiddleware, middleware.RoleAdmin, getUsers.Handle)
+	user.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, getUsers.Handle)
 	user.Get("/me", middleware.AuthMiddleware, me.Handle)
 	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
 

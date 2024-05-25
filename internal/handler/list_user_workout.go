@@ -2,8 +2,10 @@ package handler
 
 import (
 	"github.com/anilozgok/cardea-gp/internal/database"
+	"github.com/anilozgok/cardea-gp/internal/model/entity"
 	"github.com/anilozgok/cardea-gp/internal/model/response"
 	"github.com/gofiber/fiber/v2"
+	"github.com/samber/lo"
 	"go.uber.org/zap"
 )
 
@@ -27,9 +29,8 @@ func (h *ListUserWorkoutHandler) Handle(c *fiber.Ctx) error {
 		return err
 	}
 
-	res := make([]response.WorkoutResponse, 0)
-	for _, w := range workouts {
-		res = append(res, response.WorkoutResponse{
+	workoutRes := lo.Map(workouts, func(w entity.Workout, _ int) response.WorkoutResponse {
+		return response.WorkoutResponse{
 			WorkoutId:   w.ID,
 			UserId:      w.UserId,
 			CoachId:     w.CoachId,
@@ -38,8 +39,8 @@ func (h *ListUserWorkoutHandler) Handle(c *fiber.Ctx) error {
 			Area:        w.Area,
 			Rep:         w.Rep,
 			Sets:        w.Sets,
-		})
-	}
+		}
+	})
 
-	return c.JSON(response.WorkoutListResponse{Workouts: res})
+	return c.JSON(response.WorkoutListResponse{Workouts: workoutRes})
 }
