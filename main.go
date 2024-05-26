@@ -95,7 +95,7 @@ func main() {
 	auth.Put("/update-password", updatePassword.Handle)
 
 	user := r.Group("/user")
-	user.Get("/all", middleware.AuthMiddleware, middleware.RoleAdmin, getUsers.Handle)
+	user.Get("/all", middleware.AuthMiddleware, middleware.RoleCoach, getUsers.Handle)
 	user.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listUsers.Handle)
 	user.Get("/me", middleware.AuthMiddleware, me.Handle)
 	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
