@@ -26,6 +26,7 @@ type Repository interface {
 	ListExercises(ctx context.Context) ([]entity.Exercise, error)
 	GetExerciseById(ctx context.Context, id uint) (*entity.Exercise, error)
 	CreateDiet(ctx context.Context, diet *entity.Diet) error
+	DeleteDiet(ctx context.Context, id uint) error
 }
 
 type repository struct {
@@ -163,5 +164,10 @@ func (r *repository) GetExerciseById(ctx context.Context, id uint) (*entity.Exer
 
 func (r *repository) CreateDiet(ctx context.Context, diet *entity.Diet) error {
 	tx := r.db.WithContext(ctx).Create(diet)
+	return tx.Error
+}
+
+func (r *repository) DeleteDiet(ctx context.Context, id uint) error {
+	tx := r.db.WithContext(ctx).Delete(&entity.Diet{}, id)
 	return tx.Error
 }

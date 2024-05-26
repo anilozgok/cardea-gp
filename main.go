@@ -68,6 +68,7 @@ func main() {
 
 	listUsers := handler.NewListUsersHandler(repo)
 	createDiet := handler.NewCreateDietHandler(repo)
+	deleteDiet := handler.NewDeleteDietHandler(repo)
 
 	app := fiber.New()
 
@@ -95,7 +96,7 @@ func main() {
 	auth.Put("/update-password", updatePassword.Handle)
 
 	user := r.Group("/user")
-	user.Get("/all", middleware.AuthMiddleware, middleware.RoleAdmin, getUsers.Handle)
+	user.Get("/all", middleware.AuthMiddleware, middleware.RoleCoach, getUsers.Handle)
 	user.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listUsers.Handle)
 	user.Get("/me", middleware.AuthMiddleware, me.Handle)
 	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
@@ -115,6 +116,7 @@ func main() {
 
 	diet := r.Group("/diet")
 	diet.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createDiet.Handle)
+	diet.Delete("/", middleware.AuthMiddleware, middleware.RoleCoach, deleteDiet.Handle)
 
 	go func() {
 		err = app.Listen(":8080")
