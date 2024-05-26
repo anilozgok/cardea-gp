@@ -67,6 +67,7 @@ func main() {
 	listExercises := handler.NewListExercisesHandler(repo)
 
 	listUsers := handler.NewListUsersHandler(repo)
+	createDiet := handler.NewCreateDietHandler(repo)
 
 	app := fiber.New()
 
@@ -95,7 +96,7 @@ func main() {
 
 	user := r.Group("/user")
 	user.Get("/all", middleware.AuthMiddleware, middleware.RoleAdmin, getUsers.Handle)
-	user.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, getUsers.Handle)
+	user.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listUsers.Handle)
 	user.Get("/me", middleware.AuthMiddleware, me.Handle)
 	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
 
@@ -111,6 +112,9 @@ func main() {
 	profile.Get("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.GetProfile)
 	profile.Put("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.UpdateProfile)
 	profile.Post("/upload-photo", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.UploadPhoto)
+
+	diet := r.Group("/diet")
+	diet.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createDiet.Handle)
 
 	go func() {
 		err = app.Listen(":8080")
