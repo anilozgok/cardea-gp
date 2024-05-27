@@ -30,15 +30,26 @@ func (h *ListUserWorkoutHandler) Handle(c *fiber.Ctx) error {
 	}
 
 	workoutRes := lo.Map(workouts, func(w entity.Workout, _ int) response.WorkoutResponse {
+		exercise, err := h.repo.GetExerciseById(c.Context(), w.Exercise)
+		if err != nil {
+			zap.L().Error("error while listing workouts", zap.Error(err), zap.Uint("userId", userId))
+			c.Status(fiber.StatusInternalServerError).SendString("Internal server error")
+			return response.WorkoutResponse{}
+		}
+
 		return response.WorkoutResponse{
-			WorkoutId:   w.ID,
-			UserId:      w.UserId,
-			CoachId:     w.CoachId,
-			Name:        w.Name,
-			Description: w.Description,
-			Area:        w.Area,
-			Rep:         w.Rep,
-			Sets:        w.Sets,
+			WorkoutId:    w.ID,
+			UserId:       w.UserId,
+			CoachId:      w.CoachId,
+			Name:         w.Name,
+			Description:  w.Description,
+			Area:         w.Area,
+			Rep:          w.Rep,
+			Sets:         w.Sets,
+			Exercise:     w.Exercise,
+			ExerciseName: exercise.Name,
+			Gif:          exercise.Gif,
+			Equipment:    exercise.Equipment,
 		}
 	})
 
