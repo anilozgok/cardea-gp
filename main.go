@@ -67,8 +67,11 @@ func main() {
 	listExercises := handler.NewListExercisesHandler(repo)
 
 	listUsers := handler.NewListUsersHandler(repo)
+
 	createDiet := handler.NewCreateDietHandler(repo)
 	deleteDiet := handler.NewDeleteDietHandler(repo)
+
+	changePassword := handler.NewChangePasswordHandler(repo)
 
 	app := fiber.New()
 
@@ -100,6 +103,7 @@ func main() {
 	user.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listUsers.Handle)
 	user.Get("/me", middleware.AuthMiddleware, me.Handle)
 	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
+	user.Put("/change-password", middleware.AuthMiddleware, middleware.RoleUser, changePassword.Handle)
 
 	workout := r.Group("/workout")
 	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createWorkout.Handle)

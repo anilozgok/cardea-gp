@@ -26,3 +26,8 @@ type ForgotPassword struct {
 type VerifyPasscode struct {
 	Passcode int `json:"passcode" validate:"required"`
 }
+
+type ChangePassword struct {
+	OldPassword string `json:"oldPassword" validate:"required"`
+	NewPassword string `json:"newPassword" validate:"required"`
+}
