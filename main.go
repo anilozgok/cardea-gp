@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
 	"github.com/anilozgok/cardea-gp/internal/config"
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/internal/handler"
@@ -12,10 +17,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 var isLocalMode = os.Getenv("CARDEA_GP_LOCAL_MODE") == "true"
@@ -73,6 +74,8 @@ func main() {
 
 	changePassword := handler.NewChangePasswordHandler(repo)
 
+	userInfo := handler.NewLListUserInfoHandler(repo)
+
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
@@ -102,6 +105,7 @@ func main() {
 	user.Get("/all", middleware.AuthMiddleware, middleware.RoleCoach, getUsers.Handle)
 	user.Get("/", middleware.AuthMiddleware, middleware.RoleCoach, listUsers.Handle)
 	user.Get("/me", middleware.AuthMiddleware, me.Handle)
+	user.Get("/get-user-info", middleware.AuthMiddleware, userInfo.Handle)
 	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
 	user.Put("/change-password", middleware.AuthMiddleware, middleware.RoleUser, changePassword.Handle)
 
