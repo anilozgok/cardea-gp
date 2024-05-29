@@ -11,7 +11,7 @@ type ListUserInfoHandler struct {
 	repo database.Repository
 }
 
-func NewLListUserInfoHandler(repo database.Repository) *ListUserInfoHandler {
+func NewListUserInfoHandler(repo database.Repository) *ListUserInfoHandler {
 	return &ListUserInfoHandler{repo: repo}
 }
 

@@ -74,7 +74,7 @@ func main() {
 
 	changePassword := handler.NewChangePasswordHandler(repo)
 
-	userInfo := handler.NewLListUserInfoHandler(repo)
+	userInfo := handler.NewListUserInfoHandler(repo)
 
 	listPhotosHandler := handler.NewListPhotosHandler(repo)
 
