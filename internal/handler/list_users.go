@@ -20,27 +20,13 @@ func NewListUsersHandler(repo database.Repository) *ListUsersHandler {
 func (h *ListUsersHandler) Handle(c *fiber.Ctx) error {
 	coachId := c.Locals("userId").(uint)
 
-	workouts, err := h.repo.ListWorkoutByCoachId(c.Context(), coachId)
+	usersOfCoach, err := h.repo.GetStudentsOfCoach(c.Context(), coachId)
 	if err != nil {
-		zap.L().Error("error while listing workouts", zap.Error(err))
-		c.Status(fiber.StatusInternalServerError)
-		return err
+		zap.L().Error("error while getting students", zap.Uint("coachId", coachId), zap.Error(err))
+		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	userIds := lo.Map(workouts, func(w entity.Workout, _ int) uint {
-		return w.UserId
-	})
-
-	users, err := h.repo.GetUsers(c.Context())
-	if err != nil {
-		zap.L().Error("error while listing users", zap.Error(err))
-		c.Status(fiber.StatusInternalServerError)
-		return err
-	}
-
-	usersFiltered := lo.Map(lo.Filter(users, func(u entity.User, i int) bool {
-		return lo.Contains(userIds, u.ID)
-	}), func(u entity.User, _ int) response.UserResponse {
+	users := lo.Map(usersOfCoach, func(u entity.User, _ int) response.UserResponse {
 		return response.UserResponse{
 			UserId:    u.ID,
 			Email:     u.Email,
@@ -49,5 +35,5 @@ func (h *ListUsersHandler) Handle(c *fiber.Ctx) error {
 		}
 	})
 
-	return c.JSON(response.UserListResponse{Users: usersFiltered})
+	return c.JSON(response.UserListResponse{Users: users})
 }

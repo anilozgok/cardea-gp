@@ -73,6 +73,8 @@ func main() {
 
 	changePassword := handler.NewChangePasswordHandler(repo)
 
+	listPhotosHandler := handler.NewListPhotosHandler(repo)
+
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
@@ -104,6 +106,8 @@ func main() {
 	user.Get("/me", middleware.AuthMiddleware, me.Handle)
 	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
 	user.Put("/change-password", middleware.AuthMiddleware, middleware.RoleUser, changePassword.Handle)
+	user.Get("/my-photos", middleware.AuthMiddleware, middleware.RoleUser, listPhotosHandler.GetPhotosOfUser)
+	user.Get("/student-photos", middleware.AuthMiddleware, middleware.RoleCoach, listPhotosHandler.GetPhotosOfStudents)
 
 	workout := r.Group("/workout")
 	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createWorkout.Handle)

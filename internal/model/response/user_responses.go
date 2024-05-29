@@ -21,3 +21,7 @@ type MeResponse struct {
 	Email  string `json:"email"`
 	Role   string `json:"role"`
 }
+
+type PhotosResponse struct {
+	Photos []string `json:"photos"`
+}

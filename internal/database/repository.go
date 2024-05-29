@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/anilozgok/cardea-gp/internal/model/entity"
+	"github.com/samber/lo"
 	"gorm.io/gorm"
 )
 
@@ -27,6 +28,8 @@ type Repository interface {
 	GetExerciseById(ctx context.Context, id uint) (*entity.Exercise, error)
 	CreateDiet(ctx context.Context, diet *entity.Diet) error
 	DeleteDiet(ctx context.Context, id uint) error
+	GetImages(ctx context.Context) ([]entity.Image, error)
+	GetStudentsOfCoach(ctx context.Context, coachId uint) ([]entity.User, error)
 }
 
 type repository struct {
@@ -170,4 +173,35 @@ func (r *repository) CreateDiet(ctx context.Context, diet *entity.Diet) error {
 func (r *repository) DeleteDiet(ctx context.Context, id uint) error {
 	tx := r.db.WithContext(ctx).Delete(&entity.Diet{}, id)
 	return tx.Error
+}
+
+func (r *repository) GetImages(ctx context.Context) ([]entity.Image, error) {
+	var images []entity.Image
+	tx := r.db.WithContext(ctx).Find(&images)
+	if tx.Error != nil {
+		return nil, tx.Error
+	}
+	return images, nil
+}
+
+func (r *repository) GetStudentsOfCoach(ctx context.Context, coachId uint) ([]entity.User, error) {
+	workouts, err := r.ListWorkoutByCoachId(ctx, coachId)
+	if err != nil {
+		return nil, err
+	}
+
+	userIds := lo.Uniq(lo.Map(workouts, func(w entity.Workout, _ int) uint {
+		return w.UserId
+	}))
+
+	users, err := r.GetUsers(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	usersFiltered := lo.Filter(users, func(u entity.User, i int) bool {
+		return lo.Contains(userIds, u.ID)
+	})
+
+	return usersFiltered, nil
 }
