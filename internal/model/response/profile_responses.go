@@ -14,5 +14,11 @@ type ProfileResponse struct {
 	Weight         float32   `json:"weight"`
 	ProfilePicture string    `json:"profilePicture"`
 	Experience     string    `json:"experience"`
-	Specialization string    `json:"specializations"`
+	Specialization string    `json:"specialization"`
+	Phone          string    `json:"phone"`
+	Country        string    `json:"country"`
+	StateProvince  string    `json:"stateProvince"`
+	Address        string    `json:"address"`
+	City           string    `json:"city"`
+	ZipCode        string    `json:"zipCode"`
 }

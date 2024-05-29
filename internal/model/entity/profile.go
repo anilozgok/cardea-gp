@@ -11,6 +11,12 @@ type Profile struct {
 	ProfilePictureURL string
 	Experience        string
 	Specialization    string
+	Phone             string
+	Country           string
+	StateProvince     string
+	Address           string
+	City              string
+	ZipCode           string
 }
 
 type Image struct {
