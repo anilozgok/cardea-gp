@@ -2,6 +2,8 @@ package handler
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/internal/model/entity"
 	"github.com/anilozgok/cardea-gp/internal/model/request"
@@ -9,7 +11,6 @@ import (
 	"github.com/anilozgok/cardea-gp/internal/validators"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
-	"os"
 )
 
 type ProfileHandler struct {
@@ -53,6 +54,12 @@ func (h *ProfileHandler) CreateProfile(c *fiber.Ctx) error {
 		ProfilePictureURL: req.ProfilePicture,
 		Experience:        req.Experience,
 		Specialization:    req.Specialization,
+		Phone:             req.Specialization,
+		Country:           req.Country,
+		StateProvince:     req.StateProvince,
+		Address:           req.Address,
+		City:              req.Address,
+		ZipCode:           req.ZipCode,
 	}
 
 	if err := h.repo.CreateProfile(c.Context(), profile); err != nil {
@@ -94,6 +101,12 @@ func (h *ProfileHandler) UpdateProfile(c *fiber.Ctx) error {
 	profile.ProfilePictureURL = req.ProfilePicture
 	profile.Experience = req.Experience
 	profile.Specialization = req.Specialization
+	profile.Address = req.Address
+	profile.City = req.City
+	profile.Country = req.Country
+	profile.Phone = req.Phone
+	profile.ZipCode = req.ZipCode
+	profile.StateProvince = req.StateProvince
 
 	if err := h.repo.UpdateProfile(c.Context(), profile); err != nil {
 		zap.L().Error("error while updating profile", zap.Error(err))
@@ -140,6 +153,12 @@ func (h *ProfileHandler) GetProfile(c *fiber.Ctx) error {
 		ProfilePicture: maybeProfile.ProfilePictureURL,
 		Experience:     maybeProfile.Experience,
 		Specialization: maybeProfile.Specialization,
+		Phone:          maybeProfile.Phone,
+		Country:        maybeProfile.Country,
+		StateProvince:  maybeProfile.StateProvince,
+		Address:        maybeProfile.Address,
+		City:           maybeProfile.City,
+		ZipCode:        maybeProfile.ZipCode,
 	})
 }
 
