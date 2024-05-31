@@ -31,8 +31,11 @@ func (h *ListPhotosHandler) GetPhotosOfUser(c *fiber.Ctx) error {
 		return p.UserId == userId
 	})
 
-	photoURLs := lo.Map(usersPhotos, func(p entity.Image, _ int) string {
-		return fmt.Sprintf("%s/%s", c.BaseURL(), p.ImagePath)
+	photoURLs := lo.Map(usersPhotos, func(p entity.Image, _ int) response.PhotoResponse {
+		return response.PhotoResponse{
+			Photo:     fmt.Sprintf("%s/%s", c.BaseURL(), p.ImagePath),
+			CreatedAt: p.CreatedAt,
+		}
 	})
 
 	return c.JSON(response.PhotosResponse{Photos: photoURLs})
@@ -61,8 +64,11 @@ func (h *ListPhotosHandler) GetPhotosOfStudents(c *fiber.Ctx) error {
 		return lo.Contains(userIds, p.UserId)
 	})
 
-	photoURLs := lo.Map(photosOfStudents, func(p entity.Image, _ int) string {
-		return fmt.Sprintf("%s/%s", c.BaseURL(), p.ImagePath)
+	photoURLs := lo.Map(photosOfStudents, func(p entity.Image, _ int) response.PhotoResponse {
+		return response.PhotoResponse{
+			Photo:     fmt.Sprintf("%s/%s", c.BaseURL(), p.ImagePath),
+			CreatedAt: p.CreatedAt,
+		}
 	})
 
 	return c.JSON(response.PhotosResponse{Photos: photoURLs})
