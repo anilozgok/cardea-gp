@@ -19,9 +19,9 @@ type Profile struct {
 	ZipCode           string
 }
 
-type Image struct {
+type Photo struct {
 	gorm.Model
 	UserId    uint
-	ImageName string
-	ImagePath string
+	PhotoName string
+	PhotoPath string
 }

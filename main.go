@@ -77,6 +77,7 @@ func main() {
 	userInfo := handler.NewListUserInfoHandler(repo)
 
 	listPhotosHandler := handler.NewListPhotosHandler(repo)
+	deletePhotoHandler := handler.NewDeletePhotoHandler(repo)
 
 	app := fiber.New()
 
@@ -112,6 +113,7 @@ func main() {
 	user.Put("/change-password", middleware.AuthMiddleware, middleware.RoleUser, changePassword.Handle)
 	user.Get("/my-photos", middleware.AuthMiddleware, middleware.RoleUser, listPhotosHandler.GetPhotosOfUser)
 	user.Get("/student-photos", middleware.AuthMiddleware, middleware.RoleCoach, listPhotosHandler.GetPhotosOfStudents)
+	user.Delete("/photo", middleware.AuthMiddleware, middleware.RoleUser, deletePhotoHandler.Handle)
 
 	workout := r.Group("/workout")
 	workout.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createWorkout.Handle)
