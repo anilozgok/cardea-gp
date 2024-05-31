@@ -8,6 +8,7 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"strconv"
 	"strings"
 )
 
@@ -37,6 +38,11 @@ func (d *DB) Initialize() *gorm.DB {
 		zap.L().Fatal("failed to inject initial data to cardea db", zap.Error(err))
 	}
 
+	err = injectInitFoodData(db)
+	if err != nil {
+		zap.L().Fatal("failed to inject initial food data to cardea db", zap.Error(err))
+	}
+
 	zap.L().Info("database initialized successfully")
 
 	return db
@@ -62,6 +68,8 @@ func migrate(db *gorm.DB) error {
 		&entity.Profile{},
 		&entity.Image{},
 		&entity.Diet{},
+		&entity.Meal{},
+		&entity.Food{},
 	)
 }
 
@@ -91,7 +99,6 @@ func injectInitData(db *gorm.DB) error {
 		exercises = append(exercises, exercise)
 	}
 
-	// truncate table (deletes the existing records and overrides new records)
 	tx := db.Exec("TRUNCATE ONLY exercises RESTART IDENTITY;")
 	if tx.Error != nil {
 		return tx.Error
@@ -105,10 +112,54 @@ func injectInitData(db *gorm.DB) error {
 	return nil
 }
 
+func injectInitFoodData(db *gorm.DB) error {
+	rows, err := reader.CSV("diet.csv")
+	if err != nil {
+		return err
+	}
+
+	foods := make([]entity.Food, 0)
+
+	for i, r := range rows {
+		if i == 0 {
+			continue
+		}
+
+		avgServingSize, err := strconv.ParseFloat(r[1], 64)
+		if err != nil {
+			return fmt.Errorf("error parsing avg serving size: %v", err)
+		}
+
+		calories, err := strconv.ParseFloat(r[2], 64)
+		if err != nil {
+			return fmt.Errorf("error parsing calories: %v", err)
+		}
+
+		food := entity.Food{
+			Name:           r[0],
+			AvgServingSize: avgServingSize,
+			Calories:       calories,
+			Category:       r[3],
+		}
+
+		foods = append(foods, food)
+		zap.L().Info("Food item added", zap.String("name", food.Name))
+	}
+
+	tx := db.Exec("TRUNCATE ONLY foods RESTART IDENTITY;")
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	tx = db.CreateInBatches(&foods, 100)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	return nil
+}
+
 func convertGIFURL(oldURL string) string {
-	// converts gif url to embedded gif url format like below
-	// https://media0.giphy.com/media/vvzFNc1kRSqTzrFLOT/giphy.gif
-	// https://giphy.com/embed/vvzFNc1kRSqTzrFLOT
 	splits := strings.Split(oldURL, "/")
 	return fmt.Sprintf("https://giphy.com/embed/%s", splits[len(splits)-2])
 }

@@ -26,10 +26,14 @@ type Repository interface {
 	DeleteWorkout(ctx context.Context, id uint) error
 	ListExercises(ctx context.Context) ([]entity.Exercise, error)
 	GetExerciseById(ctx context.Context, id uint) (*entity.Exercise, error)
-	CreateDiet(ctx context.Context, diet *entity.Diet) error
-	DeleteDiet(ctx context.Context, id uint) error
 	GetImages(ctx context.Context) ([]entity.Image, error)
 	GetStudentsOfCoach(ctx context.Context, coachId uint) ([]entity.User, error)
+	CreateDiet(ctx context.Context, diet *entity.Diet) error
+	UpdateDiet(ctx context.Context, diet *entity.Diet) error
+	GetDietByID(ctx context.Context, dietID uint) (*entity.Diet, error)
+	DeleteDiet(ctx context.Context, dietId uint) error
+	ListDiets(ctx context.Context, userId uint) ([]entity.Diet, error)
+	ListFoods(ctx context.Context) ([]*entity.Food, error)
 }
 
 type repository struct {
@@ -165,16 +169,6 @@ func (r *repository) GetExerciseById(ctx context.Context, id uint) (*entity.Exer
 	return exercise, tx.Error
 }
 
-func (r *repository) CreateDiet(ctx context.Context, diet *entity.Diet) error {
-	tx := r.db.WithContext(ctx).Create(diet)
-	return tx.Error
-}
-
-func (r *repository) DeleteDiet(ctx context.Context, id uint) error {
-	tx := r.db.WithContext(ctx).Delete(&entity.Diet{}, id)
-	return tx.Error
-}
-
 func (r *repository) GetImages(ctx context.Context) ([]entity.Image, error) {
 	var images []entity.Image
 	tx := r.db.WithContext(ctx).Find(&images)
@@ -204,4 +198,42 @@ func (r *repository) GetStudentsOfCoach(ctx context.Context, coachId uint) ([]en
 	})
 
 	return usersFiltered, nil
+}
+
+func (r *repository) CreateDiet(ctx context.Context, diet *entity.Diet) error {
+	return r.db.WithContext(ctx).Create(diet).Error
+}
+
+func (r *repository) UpdateDiet(ctx context.Context, diet *entity.Diet) error {
+	return r.db.WithContext(ctx).Save(diet).Error
+}
+
+func (r *repository) GetDietByID(ctx context.Context, dietID uint) (*entity.Diet, error) {
+	var diet entity.Diet
+	if err := r.db.WithContext(ctx).Preload("Meals").First(&diet, dietID).Error; err != nil {
+		return nil, err
+	}
+	return &diet, nil
+}
+func (r *repository) DeleteDiet(ctx context.Context, dietId uint) error {
+	if err := r.db.WithContext(ctx).Delete(&entity.Diet{}, dietId).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repository) ListDiets(ctx context.Context, userId uint) ([]entity.Diet, error) {
+	var diets []entity.Diet
+	if err := r.db.WithContext(ctx).Where("user_id = ?", userId).Preload("Meals").Find(&diets).Error; err != nil {
+		return nil, err
+	}
+	return diets, nil
+}
+
+func (r *repository) ListFoods(ctx context.Context) ([]*entity.Food, error) {
+	var foods []*entity.Food
+	if err := r.db.WithContext(ctx).Find(&foods).Error; err != nil {
+		return nil, err
+	}
+	return foods, nil
 }
