@@ -33,3 +33,8 @@ type UpdateProfileRequest struct {
 type UploadPhotoRequest struct {
 	PhotoURL string `json:"photoUrl"`
 }
+
+type DeletePhotoRequest struct {
+	PhotoID  uint   `json:"photoId"`
+	PhotoURL string `json:"photoUrl"`
+}

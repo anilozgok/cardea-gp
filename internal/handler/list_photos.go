@@ -27,12 +27,16 @@ func (h *ListPhotosHandler) GetPhotosOfUser(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	usersPhotos := lo.Filter(photos, func(p entity.Image, _ int) bool {
+	usersPhotos := lo.Filter(photos, func(p entity.Photo, _ int) bool {
 		return p.UserId == userId
 	})
 
-	photoURLs := lo.Map(usersPhotos, func(p entity.Image, _ int) string {
-		return fmt.Sprintf("%s/%s", c.BaseURL(), p.ImagePath)
+	photoURLs := lo.Map(usersPhotos, func(p entity.Photo, _ int) response.PhotoResponse {
+		return response.PhotoResponse{
+			PhotoId:   p.ID,
+			Photo:     fmt.Sprintf("%s/%s", c.BaseURL(), p.PhotoPath),
+			CreatedAt: p.CreatedAt,
+		}
 	})
 
 	return c.JSON(response.PhotosResponse{Photos: photoURLs})
@@ -57,12 +61,16 @@ func (h *ListPhotosHandler) GetPhotosOfStudents(c *fiber.Ctx) error {
 		return u.ID
 	})
 
-	photosOfStudents := lo.Filter(photos, func(p entity.Image, _ int) bool {
+	photosOfStudents := lo.Filter(photos, func(p entity.Photo, _ int) bool {
 		return lo.Contains(userIds, p.UserId)
 	})
 
-	photoURLs := lo.Map(photosOfStudents, func(p entity.Image, _ int) string {
-		return fmt.Sprintf("%s/%s", c.BaseURL(), p.ImagePath)
+	photoURLs := lo.Map(photosOfStudents, func(p entity.Photo, _ int) response.PhotoResponse {
+		return response.PhotoResponse{
+			PhotoId:   p.ID,
+			Photo:     fmt.Sprintf("%s/%s", c.BaseURL(), p.PhotoPath),
+			CreatedAt: p.CreatedAt,
+		}
 	})
 
 	return c.JSON(response.PhotosResponse{Photos: photoURLs})

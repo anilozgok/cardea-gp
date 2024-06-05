@@ -20,13 +20,13 @@ type Repository interface {
 	CreateProfile(ctx context.Context, profile *entity.Profile) error
 	GetProfileByUserId(ctx context.Context, userId uint) (*entity.Profile, error)
 	UpdateProfile(ctx context.Context, profile *entity.Profile) error
-	AddPhoto(ctx context.Context, photo *entity.Image) error
+	AddPhoto(ctx context.Context, photo *entity.Photo) error
 	GetWorkoutById(ctx context.Context, id uint) (*entity.Workout, error)
 	UpdateWorkout(ctx context.Context, workout entity.Workout) error
 	DeleteWorkout(ctx context.Context, id uint) error
 	ListExercises(ctx context.Context) ([]entity.Exercise, error)
 	GetExerciseById(ctx context.Context, id uint) (*entity.Exercise, error)
-	GetImages(ctx context.Context) ([]entity.Image, error)
+	GetImages(ctx context.Context) ([]entity.Photo, error)
 	GetStudentsOfCoach(ctx context.Context, coachId uint) ([]entity.User, error)
 	CreateDiet(ctx context.Context, diet *entity.Diet) error
 	UpdateDiet(ctx context.Context, diet *entity.Diet) error
@@ -34,6 +34,7 @@ type Repository interface {
 	DeleteDiet(ctx context.Context, dietId uint) error
 	ListDiets(ctx context.Context, userId uint) ([]entity.Diet, error)
 	ListFoods(ctx context.Context) ([]*entity.Food, error)
+	DeletePhotoById(ctx context.Context, id uint) error
 }
 
 type repository struct {
@@ -127,7 +128,7 @@ func (r *repository) UpdateProfile(ctx context.Context, profile *entity.Profile)
 	return tx.Error
 }
 
-func (r *repository) AddPhoto(ctx context.Context, photo *entity.Image) error {
+func (r *repository) AddPhoto(ctx context.Context, photo *entity.Photo) error {
 	tx := r.db.WithContext(ctx).Create(photo)
 	return tx.Error
 }
@@ -169,8 +170,8 @@ func (r *repository) GetExerciseById(ctx context.Context, id uint) (*entity.Exer
 	return exercise, tx.Error
 }
 
-func (r *repository) GetImages(ctx context.Context) ([]entity.Image, error) {
-	var images []entity.Image
+func (r *repository) GetImages(ctx context.Context) ([]entity.Photo, error) {
+	var images []entity.Photo
 	tx := r.db.WithContext(ctx).Find(&images)
 	if tx.Error != nil {
 		return nil, tx.Error
@@ -236,4 +237,9 @@ func (r *repository) ListFoods(ctx context.Context) ([]*entity.Food, error) {
 		return nil, err
 	}
 	return foods, nil
+}
+
+func (r *repository) DeletePhotoById(ctx context.Context, id uint) error {
+	tx := r.db.WithContext(ctx).Delete(&entity.Photo{}, id)
+	return tx.Error
 }

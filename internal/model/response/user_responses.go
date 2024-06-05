@@ -22,6 +22,12 @@ type MeResponse struct {
 	Role   string `json:"role"`
 }
 
+type PhotoResponse struct {
+	PhotoId   uint      `json:"photoId"`
+	PhotoURL  string    `json:"photoURL"`
+	CreatedAt time.Time `json:"createdAt"`
+}
+
 type PhotosResponse struct {
-	Photos []string `json:"photos"`
+	Photos []PhotoResponse `json:"photos"`
 }

@@ -186,10 +186,10 @@ func (h *ProfileHandler) UploadPhoto(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	photo := &entity.Image{
+	photo := &entity.Photo{
 		UserId:    userId,
-		ImageName: fileName,
-		ImagePath: filePath,
+		PhotoName: fileName,
+		PhotoPath: filePath,
 	}
 
 	if err = h.repo.AddPhoto(c.Context(), photo); err != nil {
