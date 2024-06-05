@@ -9,7 +9,7 @@ type Workout struct {
 	UserId      uint
 	CoachId     uint
 	Name        string
-	Exercise    uint
+	ExerciseId  uint
 	Description string
 	Area        string
 	Rep         int
