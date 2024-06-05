@@ -70,7 +70,9 @@ func main() {
 	listUsers := handler.NewListUsersHandler(repo)
 
 	createDiet := handler.NewCreateDietHandler(repo)
+	updateDiet := handler.NewUpdateDietHandler(repo) // Ensure this handler is included
 	deleteDiet := handler.NewDeleteDietHandler(repo)
+	listDiet := handler.NewListDietHandler(repo)
 
 	changePassword := handler.NewChangePasswordHandler(repo)
 
@@ -79,11 +81,14 @@ func main() {
 	listPhotosHandler := handler.NewListPhotosHandler(repo)
 	deletePhotoHandler := handler.NewDeletePhotoHandler(repo)
 
+	listFoods := handler.NewListFoodsHandler(repo)
+
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "http://localhost:5173",
-		AllowHeaders:     "Origin, Content-Type, Accept",
+		AllowMethods:     "GET,POST,PUT,DELETE",
+		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
 
@@ -130,7 +135,12 @@ func main() {
 
 	diet := r.Group("/diet")
 	diet.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createDiet.Handle)
+	diet.Get("/", middleware.AuthMiddleware, listDiet.Handle)                         // Allow both coaches and users to list diets
+	diet.Put("/", middleware.AuthMiddleware, middleware.RoleCoach, updateDiet.Handle) // Ensure PUT method is defined
 	diet.Delete("/", middleware.AuthMiddleware, middleware.RoleCoach, deleteDiet.Handle)
+
+	food := r.Group("/foods")
+	food.Get("/", middleware.AuthMiddleware, listFoods.Handle) // Allow both coaches and users to list diets
 
 	go func() {
 		err = app.Listen(":8080")

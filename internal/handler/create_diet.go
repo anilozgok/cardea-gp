@@ -24,7 +24,7 @@ func (h *CreateDietHandler) Handle(c *fiber.Ctx) error {
 	req := new(request.CreateDietRequest)
 	if err := c.BodyParser(req); err != nil {
 		zap.L().Error("error while parsing request body", zap.Error(err))
-		c.Status(fiber.StatusInternalServerError)
+		c.Status(fiber.StatusBadRequest)
 		return err
 	}
 
@@ -49,15 +49,24 @@ func (h *CreateDietHandler) Handle(c *fiber.Ctx) error {
 		return errors.New("user not found")
 	}
 
+	var meals []entity.Meal
+	for _, mealReq := range req.Meals {
+		meal := entity.Meal{
+			Name:        mealReq.Name,
+			Description: mealReq.Description,
+			Calories:    mealReq.Calories,
+			Protein:     mealReq.Protein,
+			Carbs:       mealReq.Carbs,
+			Fat:         mealReq.Fat,
+		}
+		meals = append(meals, meal)
+	}
+
 	diet := entity.Diet{
-		UserId:      req.UserId,
-		CoachId:     coachId,
-		Meal:        req.Meal,
-		Description: req.Description,
-		Calories:    req.Calories,
-		Protein:     req.Protein,
-		Carbs:       req.Carbs,
-		Fat:         req.Fat,
+		UserId:  req.UserId,
+		CoachId: coachId,
+		Name:    req.Name,
+		Meals:   meals,
 	}
 
 	if err = h.repo.CreateDiet(c.Context(), &diet); err != nil {
@@ -66,5 +75,5 @@ func (h *CreateDietHandler) Handle(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.SendStatus(fiber.StatusOK)
+	return c.Status(fiber.StatusOK).JSON(diet)
 }

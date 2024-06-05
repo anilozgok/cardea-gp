@@ -1,10 +1,11 @@
 package handler
 
 import (
+	"strconv"
+
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/zap"
-	"strconv"
 )
 
 type DeleteDietHandler struct {
@@ -18,21 +19,19 @@ func NewDeleteDietHandler(repo database.Repository) *DeleteDietHandler {
 }
 
 func (h *DeleteDietHandler) Handle(c *fiber.Ctx) error {
-	dietId := c.Query("dietId")
-	if dietId == "" {
-		zap.L().Error("dietId not found on the query param")
-		return c.SendStatus(fiber.StatusBadRequest)
+	dietIdStr := c.Query("diet_id")
+	if dietIdStr == "" {
+		return c.Status(fiber.StatusBadRequest).SendString("diet_id is required")
 	}
 
-	id, err := strconv.Atoi(dietId)
+	dietId, err := strconv.ParseUint(dietIdStr, 10, 64)
 	if err != nil {
-		zap.L().Error("error while parsing dietId", zap.Error(err))
-		return c.SendStatus(fiber.StatusInternalServerError)
+		return c.Status(fiber.StatusBadRequest).SendString("invalid diet_id format")
 	}
 
-	if err = h.repo.DeleteDiet(c.Context(), uint(id)); err != nil {
+	if err := h.repo.DeleteDiet(c.Context(), uint(dietId)); err != nil {
 		zap.L().Error("error while deleting diet", zap.Error(err))
-		return c.SendStatus(fiber.StatusInternalServerError)
+		return c.Status(fiber.StatusInternalServerError).SendString("error while deleting diet")
 	}
 
 	return c.SendStatus(fiber.StatusOK)

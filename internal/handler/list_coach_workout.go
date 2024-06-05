@@ -35,7 +35,7 @@ func (h *ListCoachWorkoutHandler) Handle(c *fiber.Ctx) error {
 			UserId:      w.UserId,
 			CoachId:     w.CoachId,
 			Name:        w.Name,
-			Exercise:    w.Exercise,
+			Exercise:    w.ExerciseId,
 			Description: w.Description,
 			Area:        w.Area,
 			Rep:         w.Rep,
