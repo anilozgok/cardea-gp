@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/internal/model/entity"
 	"github.com/anilozgok/cardea-gp/internal/model/response"
@@ -34,7 +35,7 @@ func (h *ListPhotosHandler) GetPhotosOfUser(c *fiber.Ctx) error {
 	photoURLs := lo.Map(usersPhotos, func(p entity.Photo, _ int) response.PhotoResponse {
 		return response.PhotoResponse{
 			PhotoId:   p.ID,
-			Photo:     fmt.Sprintf("%s/%s", c.BaseURL(), p.PhotoPath),
+			PhotoURL:  fmt.Sprintf("%s/%s", c.BaseURL(), p.PhotoPath),
 			CreatedAt: p.CreatedAt,
 		}
 	})
@@ -68,7 +69,7 @@ func (h *ListPhotosHandler) GetPhotosOfStudents(c *fiber.Ctx) error {
 	photoURLs := lo.Map(photosOfStudents, func(p entity.Photo, _ int) response.PhotoResponse {
 		return response.PhotoResponse{
 			PhotoId:   p.ID,
-			Photo:     fmt.Sprintf("%s/%s", c.BaseURL(), p.PhotoPath),
+			PhotoURL:  fmt.Sprintf("%s/%s", c.BaseURL(), p.PhotoPath),
 			CreatedAt: p.CreatedAt,
 		}
 	})
