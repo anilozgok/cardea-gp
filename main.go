@@ -115,7 +115,7 @@ func main() {
 	user.Get("/me", middleware.AuthMiddleware, me.Handle)
 	user.Get("/get-user-info", middleware.AuthMiddleware, userInfo.Handle)
 	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
-	user.Put("/change-password", middleware.AuthMiddleware, middleware.RoleUser, changePassword.Handle)
+	user.Put("/change-password", middleware.AuthMiddleware, changePassword.Handle)
 	user.Get("/my-photos", middleware.AuthMiddleware, middleware.RoleUser, listPhotosHandler.GetPhotosOfUser)
 	user.Get("/student-photos", middleware.AuthMiddleware, middleware.RoleCoach, listPhotosHandler.GetPhotosOfStudents)
 	user.Delete("/photo", middleware.AuthMiddleware, middleware.RoleUser, deletePhotoHandler.Handle)
