@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/internal/model/entity"
@@ -44,12 +45,16 @@ func (h *ListPhotosHandler) GetPhotosOfUser(c *fiber.Ctx) error {
 }
 
 func (h *ListPhotosHandler) GetPhotosOfStudents(c *fiber.Ctx) error {
-	coachId := c.Locals("userId").(uint)
+	userIdParam := c.Params("userId")
+	if userIdParam == "" {
+		zap.L().Error("userId parameter is missing")
+		return c.Status(fiber.StatusBadRequest).SendString("userId parameter is missing")
+	}
 
-	usersOfCoach, err := h.repo.GetStudentsOfCoach(c.Context(), coachId)
+	userId, err := strconv.ParseUint(userIdParam, 10, 32)
 	if err != nil {
-		zap.L().Error("error while getting students", zap.Uint("coachId", coachId), zap.Error(err))
-		return c.SendStatus(fiber.StatusInternalServerError)
+		zap.L().Error("invalid userId parameter", zap.String("userIdParam", userIdParam), zap.Error(err))
+		return c.Status(fiber.StatusBadRequest).SendString("invalid userId parameter")
 	}
 
 	photos, err := h.repo.GetImages(c.Context())
@@ -58,15 +63,11 @@ func (h *ListPhotosHandler) GetPhotosOfStudents(c *fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	userIds := lo.Map(usersOfCoach, func(u entity.User, _ int) uint {
-		return u.ID
+	photosOfUser := lo.Filter(photos, func(p entity.Photo, _ int) bool {
+		return p.UserId == uint(userId)
 	})
 
-	photosOfStudents := lo.Filter(photos, func(p entity.Photo, _ int) bool {
-		return lo.Contains(userIds, p.UserId)
-	})
-
-	photoURLs := lo.Map(photosOfStudents, func(p entity.Photo, _ int) response.PhotoResponse {
+	photoURLs := lo.Map(photosOfUser, func(p entity.Photo, _ int) response.PhotoResponse {
 		return response.PhotoResponse{
 			PhotoId:   p.ID,
 			PhotoURL:  fmt.Sprintf("%s/%s", c.BaseURL(), p.PhotoPath),
