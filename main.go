@@ -83,6 +83,8 @@ func main() {
 
 	listFoods := handler.NewListFoodsHandler(repo)
 
+	listRecipes := handler.NewListRecipesHandler()
+
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
@@ -141,6 +143,8 @@ func main() {
 
 	food := r.Group("/foods")
 	food.Get("/", middleware.AuthMiddleware, listFoods.Handle) // Allow both coaches and users to list diets
+
+	r.Get("/recipes", listRecipes.Handle)
 
 	go func() {
 		err = app.Listen(":8080")
