@@ -6,6 +6,8 @@ import (
 	"github.com/anilozgok/cardea-gp/internal/model/entity"
 	"github.com/samber/lo"
 	"gorm.io/gorm"
+	"sort"
+	"strconv"
 )
 
 type Repository interface {
@@ -35,6 +37,7 @@ type Repository interface {
 	ListDiets(ctx context.Context, userId uint) ([]entity.Diet, error)
 	ListFoods(ctx context.Context) ([]*entity.Food, error)
 	DeletePhotoById(ctx context.Context, id uint) error
+	DeletePrevProfilePictures(ctx context.Context, userId uint) error
 }
 
 type repository struct {
@@ -241,5 +244,24 @@ func (r *repository) ListFoods(ctx context.Context) ([]*entity.Food, error) {
 
 func (r *repository) DeletePhotoById(ctx context.Context, id uint) error {
 	tx := r.db.WithContext(ctx).Delete(&entity.Photo{}, id)
+	return tx.Error
+}
+
+func (r *repository) DeletePrevProfilePictures(ctx context.Context, userId uint) error {
+	prefix := "pp_" + strconv.Itoa(int(userId)) + "%"
+	var profilePhotos []*entity.Photo
+	tx := r.db.WithContext(ctx).Find(&profilePhotos, "photo_name LIKE ?", prefix)
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	sort.Slice(profilePhotos, func(i, j int) bool {
+		return profilePhotos[i].CreatedAt.After(profilePhotos[j].CreatedAt)
+	})
+
+	if len(profilePhotos) > 1 {
+		tx = r.db.WithContext(ctx).Delete(profilePhotos[1:])
+	}
+
 	return tx.Error
 }

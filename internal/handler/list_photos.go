@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/internal/model/entity"
@@ -51,7 +52,7 @@ func (h *ListPhotosHandler) GetPhotosOfStudents(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString("userId parameter is missing")
 	}
 
-	userId, err := strconv.ParseUint(userIdParam, 10, 32)
+	userId, err := strconv.Atoi(userIdParam)
 	if err != nil {
 		zap.L().Error("invalid userId parameter", zap.String("userIdParam", userIdParam), zap.Error(err))
 		return c.Status(fiber.StatusBadRequest).SendString("invalid userId parameter")
@@ -76,4 +77,30 @@ func (h *ListPhotosHandler) GetPhotosOfStudents(c *fiber.Ctx) error {
 	})
 
 	return c.JSON(response.PhotosResponse{Photos: photoURLs})
+}
+
+func (h *ListPhotosHandler) GetProfilePicture(c *fiber.Ctx) error {
+	userId := c.Locals("userId").(uint)
+
+	images, err := h.repo.GetImages(c.Context())
+	if err != nil {
+		zap.L().Error("error while getting profile picture", zap.Uint("userId", userId), zap.Error(err))
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	usersProfilePicture := lo.Filter(images, func(p entity.Photo, _ int) bool {
+		return p.UserId == userId && strings.HasPrefix(p.PhotoName, "pp_")
+	})
+
+	if len(usersProfilePicture) == 0 {
+		return c.Status(fiber.StatusNotFound).SendString("profile picture not found")
+	}
+
+	profilePicture := usersProfilePicture[0]
+
+	return c.JSON(response.PhotoResponse{
+		PhotoId:   profilePicture.ID,
+		PhotoURL:  fmt.Sprintf("%s/%s", c.BaseURL(), profilePicture.PhotoPath),
+		CreatedAt: profilePicture.CreatedAt,
+	})
 }

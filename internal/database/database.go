@@ -143,7 +143,6 @@ func injectInitFoodData(db *gorm.DB) error {
 		}
 
 		foods = append(foods, food)
-		zap.L().Info("Food item added", zap.String("name", food.Name))
 	}
 
 	tx := db.Exec("TRUNCATE ONLY foods RESTART IDENTITY;")

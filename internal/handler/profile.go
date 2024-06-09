@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/anilozgok/cardea-gp/internal/database"
 	"github.com/anilozgok/cardea-gp/internal/model/entity"
@@ -179,6 +180,9 @@ func (h *ProfileHandler) UploadPhoto(c *fiber.Ctx) error {
 	}
 
 	fileName := fmt.Sprintf("%d_%s", userId, file.Filename)
+	if c.Query("is_pp") == "true" {
+		fileName = fmt.Sprintf("pp_%d%s", userId, filepath.Ext(file.Filename))
+	}
 	filePath := fmt.Sprintf("./uploads/%s", fileName)
 
 	if err = c.SaveFile(file, filePath); err != nil {
@@ -193,9 +197,14 @@ func (h *ProfileHandler) UploadPhoto(c *fiber.Ctx) error {
 	}
 
 	if err = h.repo.AddPhoto(c.Context(), photo); err != nil {
-		zap.L().Error("failed to update profile with new photo", zap.Error(err))
+		zap.L().Error("failed to upload new photo", zap.Error(err))
 		return c.SendStatus(fiber.StatusInternalServerError)
 	}
 
-	return c.SendStatus(fiber.StatusOK)
+	if err = h.repo.DeletePrevProfilePictures(c.Context(), userId); err != nil {
+		zap.L().Error("failed to delete previous profile picture", zap.Error(err))
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+
+	return c.Status(fiber.StatusOK).SendString(filePath)
 }
