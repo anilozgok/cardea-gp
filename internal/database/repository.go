@@ -35,6 +35,9 @@ type Repository interface {
 	ListDiets(ctx context.Context, userId uint) ([]entity.Diet, error)
 	ListFoods(ctx context.Context) ([]*entity.Food, error)
 	DeletePhotoById(ctx context.Context, id uint) error
+	CreateMessage(ctx context.Context, message *entity.Message) error
+	ListMessagesBetweenUsers(ctx context.Context, userID1, userID2 uint) ([]entity.Message, error)
+	GetCoachByUserId(ctx context.Context, userId uint) (*entity.User, error)
 }
 
 type repository struct {
@@ -242,4 +245,30 @@ func (r *repository) ListFoods(ctx context.Context) ([]*entity.Food, error) {
 func (r *repository) DeletePhotoById(ctx context.Context, id uint) error {
 	tx := r.db.WithContext(ctx).Delete(&entity.Photo{}, id)
 	return tx.Error
+}
+func (r *repository) CreateMessage(ctx context.Context, message *entity.Message) error {
+	return r.db.WithContext(ctx).Create(message).Error
+}
+
+func (r *repository) ListMessagesBetweenUsers(ctx context.Context, userID1, userID2 uint) ([]entity.Message, error) {
+	var messages []entity.Message
+	err := r.db.WithContext(ctx).Where(
+		"(sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)",
+		userID1, userID2, userID2, userID1,
+	).Order("created_at asc").Find(&messages).Error
+	return messages, err
+}
+
+func (r *repository) GetCoachByUserId(ctx context.Context, userId uint) (*entity.User, error) {
+	var workout entity.Workout
+	err := r.db.WithContext(ctx).Where("user_id = ?", userId).First(&workout).Error
+	if err != nil {
+		return nil, err
+	}
+	var coach entity.User
+	err = r.db.WithContext(ctx).Where("id = ?", workout.CoachId).First(&coach).Error
+	if err != nil {
+		return nil, err
+	}
+	return &coach, nil
 }

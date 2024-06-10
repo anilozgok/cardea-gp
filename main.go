@@ -40,10 +40,7 @@ func main() {
 		zap.L().Fatal("failed to read configs", zap.Error(err))
 	}
 
-	db := database.
-		New(configs).
-		Initialize()
-
+	db := database.New(configs).Initialize()
 	repo := database.NewRepository(db)
 
 	register := handler.NewRegisterHandler(repo)
@@ -61,41 +58,31 @@ func main() {
 	updatePassword := handler.NewUpdatePasswordHandler(repo, fpCtx)
 
 	profileHandler := handler.NewProfileHandler(repo)
-
 	updateWorkout := handler.NewUpdateWorkoutHandler(repo)
 	deleteWorkout := handler.NewDeleteWorkoutHandler(repo)
-
 	listExercises := handler.NewListExercisesHandler(repo)
-
 	listUsers := handler.NewListUsersHandler(repo)
-
 	createDiet := handler.NewCreateDietHandler(repo)
-	updateDiet := handler.NewUpdateDietHandler(repo) // Ensure this handler is included
+	updateDiet := handler.NewUpdateDietHandler(repo)
 	deleteDiet := handler.NewDeleteDietHandler(repo)
 	listDiet := handler.NewListDietHandler(repo)
-
 	changePassword := handler.NewChangePasswordHandler(repo)
-
 	userInfo := handler.NewListUserInfoHandler(repo)
-
 	listPhotosHandler := handler.NewListPhotosHandler(repo)
 	deletePhotoHandler := handler.NewDeletePhotoHandler(repo)
-
 	listFoods := handler.NewListFoodsHandler(repo)
-
 	listRecipes := handler.NewListRecipesHandler()
+	messageHandler := handler.NewMessageHandler(repo)
+	getCoach := handler.NewGetCoachHandler(repo)
 
 	app := fiber.New()
-
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "http://localhost:5173",
 		AllowMethods:     "GET,POST,PUT,DELETE",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
-
 	app.Static("/uploads", "./uploads")
-
 	app.Use(logger.New())
 
 	app.Get("/health", func(ctx *fiber.Ctx) error {
@@ -137,14 +124,18 @@ func main() {
 
 	diet := r.Group("/diet")
 	diet.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createDiet.Handle)
-	diet.Get("/", middleware.AuthMiddleware, listDiet.Handle)                         // Allow both coaches and users to list diets
-	diet.Put("/", middleware.AuthMiddleware, middleware.RoleCoach, updateDiet.Handle) // Ensure PUT method is defined
+	diet.Get("/", middleware.AuthMiddleware, listDiet.Handle)
+	diet.Put("/", middleware.AuthMiddleware, middleware.RoleCoach, updateDiet.Handle)
 	diet.Delete("/", middleware.AuthMiddleware, middleware.RoleCoach, deleteDiet.Handle)
 
 	food := r.Group("/foods")
-	food.Get("/", middleware.AuthMiddleware, listFoods.Handle) // Allow both coaches and users to list diets
+	food.Get("/", middleware.AuthMiddleware, listFoods.Handle)
 
 	r.Get("/recipes", listRecipes.Handle)
+	r.Post("/messages/send", middleware.AuthMiddleware, messageHandler.SendMessage)
+	r.Get("/messages/list", middleware.AuthMiddleware, messageHandler.ListMessages)
+
+	user.Get("/coach", middleware.AuthMiddleware, getCoach.Handle)
 
 	go func() {
 		err = app.Listen(":8080")

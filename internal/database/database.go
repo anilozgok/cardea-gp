@@ -70,6 +70,8 @@ func migrate(db *gorm.DB) error {
 		&entity.Diet{},
 		&entity.Meal{},
 		&entity.Food{},
+		&entity.Message{}, // Add this line
+
 	)
 }
 
