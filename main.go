@@ -119,7 +119,7 @@ func main() {
 	user.Get("/workouts", middleware.AuthMiddleware, middleware.RoleUser, listUserWorkouts.Handle)
 	user.Put("/change-password", middleware.AuthMiddleware, changePassword.Handle)
 	user.Get("/my-photos", middleware.AuthMiddleware, middleware.RoleUser, listPhotosHandler.GetPhotosOfUser)
-	user.Get("/profile-picture", middleware.AuthMiddleware, middleware.RoleUser, listPhotosHandler.GetProfilePicture)
+	user.Get("/profile-picture", middleware.AuthMiddleware, listPhotosHandler.GetProfilePicture)
 	user.Get("/student-photos/:userId", middleware.AuthMiddleware, middleware.RoleCoach, listPhotosHandler.GetPhotosOfStudents)
 	user.Delete("/photo", middleware.AuthMiddleware, middleware.RoleUser, deletePhotoHandler.Handle)
 
@@ -131,10 +131,10 @@ func main() {
 	workout.Get("/exercises", middleware.AuthMiddleware, middleware.RoleCoach, listExercises.Handle)
 
 	profile := r.Group("/profile")
-	profile.Post("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.CreateProfile)
-	profile.Get("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.GetProfile)
-	profile.Put("/", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.UpdateProfile)
-	profile.Post("/upload-photo", middleware.AuthMiddleware, middleware.RoleUser, profileHandler.UploadPhoto)
+	profile.Post("/", middleware.AuthMiddleware, profileHandler.CreateProfile)
+	profile.Get("/", middleware.AuthMiddleware, profileHandler.GetProfile)
+	profile.Put("/", middleware.AuthMiddleware, profileHandler.UpdateProfile)
+	profile.Post("/upload-photo", middleware.AuthMiddleware, profileHandler.UploadPhoto)
 
 	diet := r.Group("/diet")
 	diet.Post("/", middleware.AuthMiddleware, middleware.RoleCoach, createDiet.Handle)
