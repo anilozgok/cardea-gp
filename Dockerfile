@@ -13,6 +13,7 @@ COPY --from=builder /app/cardea /app/cardea
 COPY --from=builder /app/configs /app/configs
 COPY --from=builder /app/exercise.csv /app/exercise.csv
 COPY --from=builder /app/diet.csv /app/diet.csv
+COPY --from=builder /app/recipes_raw_nosource_epi.json /app/recipes_raw_nosource_epi.json
 EXPOSE 8080
 
 CMD ["/app/cardea"]
