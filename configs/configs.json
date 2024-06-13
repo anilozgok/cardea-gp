@@ -1,6 +1,6 @@
 {
   "cardeaDB": {
-    "host": "localhost",
+    "host": "172.18.0.3",
     "port": 5432,
     "database": "cardea"
   }
