@@ -7,6 +7,7 @@ type MealRequest struct {
 	Protein     float64 `json:"protein"`
 	Carbs       float64 `json:"carbs"`
 	Fat         float64 `json:"fat"`
+	Gram        float64 `json:"gram"`
 }
 
 type CreateDietRequest struct {

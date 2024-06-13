@@ -58,6 +58,7 @@ func (h *CreateDietHandler) Handle(c *fiber.Ctx) error {
 			Protein:     mealReq.Protein,
 			Carbs:       mealReq.Carbs,
 			Fat:         mealReq.Fat,
+			Gram:        mealReq.Gram,
 		}
 		meals = append(meals, meal)
 	}
